@@ -28,7 +28,7 @@ public class GetCloudData extends AsyncTask<String, Integer, List<Barang> > {
 	
 	private List<Barang> dataBarang = new ArrayList<Barang>();
 	
-	private String URL_DATA 	= "http://192.168.56.5/pasaribu_store/function/getDataBarang.php";
+	private String URL_DATA 	= "http://192.168.56.5/pasaribu_store/function/getDataBarang.php"; //Hanya utk kebutuhan belajar
 	private String JSON_HEADER 	= "barang"; //jenis kepala json
 	
 	
