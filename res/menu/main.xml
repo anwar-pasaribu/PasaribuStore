@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/option_setting"
+        android:showAsAction="never"
+        android:title="@string/option_setting">
+    </item>
+    <item
+        android:id="@+id/option_search"
+        android:showAsAction="ifRoom"
+        android:title="@string/option_search"
+        android:icon="@android:drawable/ic_menu_search"
+        >
+    </item>
+
+</menu>

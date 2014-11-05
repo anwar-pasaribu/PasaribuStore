@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:baselineAligned="false"
+    
+     >
+
+    <LinearLayout
+        android:id="@+id/left_pane"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:background="#A800AB"
+        android:orientation="vertical" >
+
+        <TextView
+           style="@android:style/TextAppearance.DeviceDefault.Medium"
+            android:id="@+id/title_left_pane"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_medium"
+            android:text="@string/title_recently"
+            android:textSize="@dimen/title_font_size" />
+
+        <ListView
+            android:id="@+id/list_recently"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </ListView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/content_pane"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="5"
+        android:background="#F5DE03"
+        android:orientation="vertical"
+         >
+
+        <ListView
+            android:id="@+id/list_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+             >
+
+        </ListView>
+
+    </LinearLayout>
+
+</LinearLayout>
