@@ -7,5 +7,20 @@
     <string name="option_setting">Settings</string>
     <string name="option_search">Search</string>
     <string name="title_recently">Recently</string>
+    <string name="title_activity_add_data_barang">Add Data Barang</string>
+    <string name="option_done_adding">Done</string>
+    <string name="lable_product_name">Nama Barang</string>
+    <string name="hint_product_name">Nama Barang</string>
+    <string name="lable_product_brand">Merek</string>
+    <string name="hint_product_brand">Merek</string>
+    <string name="lable_product_price">Harga Satuan</string>
+    <string name="hint_product_stock">Jumlah</string>
+    <string name="lable_product_unit">Satuan</string>
+    <string name="hint_product_unit">Satuan</string>
+    <string name="lable_product_category">Kategory</string>
+    <string name="lable_supplier">Penjual</string>
+    <string name="btn_add_supplier">Tambah Penjual</string>
+    <string name="lable_product_description">Deskripsi Barang</string>
+    <string name="hint_product_description">Deksripsi Barang</string>
 
 </resources>

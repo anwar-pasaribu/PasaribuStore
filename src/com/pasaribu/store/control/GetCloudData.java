@@ -23,8 +23,8 @@ public class GetCloudData extends AsyncTask<String, Integer, List<Barang> > {
 
 	//Kumpulan tag utk keperluan debugging
 	private String TAG_GET = "Get_cloud_data";
-	private String TAG_PROCESS_ERROR = "Get_Process_Data_ERROR";
-	private String TAG_PROCESS_RUNNING = "Get_Process_Data_RUNNING";
+	private String TAG_PROCESS_ERROR = "GetCloudData_ERROR";
+	private String TAG_PROCESS_RUNNING = "GetCloudData_RUNNING";
 	
 	private List<Barang> dataBarang = new ArrayList<Barang>();
 	
@@ -33,7 +33,7 @@ public class GetCloudData extends AsyncTask<String, Integer, List<Barang> > {
 	
 	
 	public GetCloudData() {
-		Log.i(TAG_GET, "Memulai Constructor GetCloudData");
+		Log.i(TAG_GET, "Memulai Constructor GetCloudData ");
 		
 	}
 
@@ -54,7 +54,7 @@ public class GetCloudData extends AsyncTask<String, Integer, List<Barang> > {
 			isr						= entity.getContent();
 			
 		} catch (Exception e) {
-			Log.e(TAG_PROCESS_ERROR, "Tidak Bisa Proses Http");
+			Log.e(TAG_PROCESS_ERROR, "Fail 1 : Tidak Bisa Proses Http");
 			
 		}
     	
@@ -73,7 +73,7 @@ public class GetCloudData extends AsyncTask<String, Integer, List<Barang> > {
 			result = sb.toString();
 			
 		} catch (Exception e) {
-			Log.e(TAG_PROCESS_ERROR, "Tidak bisa mengubah respon menjadi string");	
+			Log.e(TAG_PROCESS_ERROR, "Fail 2 : Tidak bisa mengubah respon menjadi string");	
 		}
     	
     	//TODO: mengambil data dari JSON
@@ -111,7 +111,7 @@ public class GetCloudData extends AsyncTask<String, Integer, List<Barang> > {
 
 			
 		} catch (Exception e) {
-			Log.e("parse_json_error", "Tidak dapat mengambil data JSON");
+			Log.e(TAG_PROCESS_ERROR, "Fail 3 : Tidak dapat mengambil data JSON");
 		}
     	
 		return dataBarang;		

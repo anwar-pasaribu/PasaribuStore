@@ -26,7 +26,6 @@ public class Home extends Fragment {
 	private List<Barang> DataBarang_home = new ArrayList<Barang>();
 	private List<ListRecentlyProduct> DataBarang_recently = new ArrayList<ListRecentlyProduct>();
 	
-	private TextView title_left_pane;
 	private ListView list_home, list_recently;
 	
 	private GetCloudData getCloudData;
@@ -48,8 +47,6 @@ public class Home extends Fragment {
 		
 		list_home = (ListView) android.findViewById(R.id.list_home);
 		list_recently = (ListView) android.findViewById(R.id.list_recently);
-		
-		title_left_pane = (TextView) android.findViewById(R.id.title_left_pane);
 		
 		populateListDataBarang();
 		
