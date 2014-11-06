@@ -36,6 +36,8 @@ public class GetCloudData extends AsyncTask<String, Integer, List<Barang> > {
 		Log.i(TAG_GET, "Memulai Constructor GetCloudData ");
 		
 	}
+	
+	
 
 	@Override
 	protected List<Barang> doInBackground(String... params) {
@@ -82,6 +84,9 @@ public class GetCloudData extends AsyncTask<String, Integer, List<Barang> > {
 			//JSONArray jArray 		= new JSONArray(result);
     		JSONArray jArray 		= jsonResponse.getJSONArray(JSON_HEADER);
 			
+    		Log.i("DataJSJONResponse", "DataJSJONResponse : " + jsonResponse.toString());
+    		Log.i("DataJSJONArray", "DataJSJONArray : " + jArray.toString());
+    		
 			//TODO: Untuk mengambil data dari JSONArray
 			for (int i = 0; i < jArray.length(); i++ ) {
 				
