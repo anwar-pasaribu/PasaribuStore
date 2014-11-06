@@ -6,5 +6,6 @@
     <dimen name="title_font_size">20sp</dimen>
     <dimen name="padding_medium">8dp</dimen>
     <dimen name="margin_medium">8dp</dimen>
+    <dimen name="margin_8dp">8dp</dimen>
 
 </resources>

@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_item_home"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    android:background="#FC2E60" >
+    tools:ignore="HardcodedText" >
 
     <ImageView
         android:id="@+id/image_status_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="@dimen/margin_medium"
+        android:layout_marginStart="@dimen/margin_medium"
         android:adjustViewBounds="true"
-        android:contentDescription="T/F"
+        android:contentDescription="@string/image_button_description"
         android:maxWidth="20dp"
         android:src="@android:drawable/btn_star" />
 
@@ -22,8 +23,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/image_status_favorite"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@+id/image_status_favorite"
+        android:contentDescription="@string/image_button_description"
         android:src="@drawable/ic_launcher" />
 
     <TextView
@@ -31,25 +33,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/image_status_favorite"
-        android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@+id/image_product"
+        android:layout_marginStart="16dp"
+        android:layout_toEndOf="@+id/image_product"
         android:text="Nama Product Yang Sangat Panjang"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/text_product_category"
+    <LinearLayout
+        android:id="@+id/layout_product_category_horizontal_scroller"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/text_product_price"
-        android:layout_below="@+id/image_product"
-        android:text="automotif"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:layout_alignStart="@+id/text_product_price"
+        android:layout_below="@+id/image_product" >
+
+        <TextView
+            android:id="@+id/text_product_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="automotif"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/text_product_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/text_product_name"
+        android:layout_alignStart="@+id/text_product_name"
         android:layout_alignTop="@+id/image_status_favorite"
         android:text="Rp 45 000,"
         android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -60,8 +68,8 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/text_product_price"
         android:layout_alignBottom="@+id/text_product_price"
-        android:layout_marginLeft="@dimen/margin_medium"
-        android:layout_toRightOf="@+id/text_product_price"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_toEndOf="@+id/text_product_price"
         android:text="140 Kotak - 20 Mei 2014"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -69,9 +77,12 @@
         android:id="@+id/btn_more_option"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="10dp"
-        android:src="@android:drawable/ic_menu_more" />
+        android:layout_marginEnd="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_8dp"
+        android:background="@drawable/ic_overflow"
+        android:contentDescription="@string/image_button_description" />
 
 </RelativeLayout>

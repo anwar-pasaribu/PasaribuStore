@@ -61,6 +61,7 @@ public class Home extends Fragment {
         
         //Memperoleh data dari proses asynctask
 	    try {
+	    	//TODO Menyalin data "barang" full ke variable aController agar bisa di akses pada activity yang lain
 			this.DataBarang_home = getCloudData.get(); //Mengambil data hasil computasi asynctask			
 			int data_size = DataBarang_home.size();
 			for(int i = 0; i < data_size; i++) {

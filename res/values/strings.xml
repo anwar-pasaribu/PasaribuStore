@@ -22,5 +22,7 @@
     <string name="btn_add_supplier">Tambah Penjual</string>
     <string name="lable_product_description">Deskripsi Barang</string>
     <string name="hint_product_description">Deksripsi Barang</string>
-
+    <string name="option_add_barang">Tambah Barang</string>
+	<string name="image_button_description">Image Button</string>
+    
 </resources>
