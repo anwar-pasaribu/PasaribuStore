@@ -10,8 +10,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 
 import com.pasaribu.store.R;
+import com.pasaribu.store.control.AppsController;
 
 public class DialogAddSupplier extends DialogFragment {
+	
+	AppsController aController;
 	
 	public interface DialogAddSupplierListener {
 		 public void onDialogPositiveClick(DialogFragment dialog);
@@ -40,6 +43,8 @@ public class DialogAddSupplier extends DialogFragment {
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		
+		aController = (AppsController) getActivity().getApplicationContext();
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 	    // Get the layout inflater
