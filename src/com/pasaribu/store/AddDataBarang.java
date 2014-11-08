@@ -62,6 +62,10 @@ public class AddDataBarang extends Activity
 	private List<String> list_data_supplier = new ArrayList<String>();
 	private List<String> list_data_product_unit = new ArrayList<String>();
 	private List<String> list_data_product_brand = new ArrayList<String>();
+
+	private String supplier;
+
+	private String kategori;
 	
 	//private DialogAddSupplier dialodAddSupplier;
 
@@ -191,11 +195,22 @@ public class AddDataBarang extends Activity
 		
 		editText_product_description.setText("");
 		
-		 
-		Toast.makeText(getApplicationContext(), 
-				"Selected : " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+		int id_spinner = parent.getId();
+	
+		switch (id_spinner) {
+		case R.id.spinner_product_category:
+			supplier = parent.getItemAtPosition(position).toString();
+			break;
+		case R.id.spinner_supplier:
+			kategori = parent.getItemAtPosition(position).toString();
+			break;
+		default:
+			editText_product_description.setText("Tidak tahu spinner aktif " + view.toString());
+			break;
+		}
 		
-		editText_product_description.setText("Spinner Aktif : " + parent.getItemAtPosition(position).toString());
+		editText_product_description.setText("Spinner Supplier : " + supplier + " \nKategori : " + kategori);
+
 		
 	}
 
@@ -228,10 +243,19 @@ public class AddDataBarang extends Activity
 	}
 
 	@Override
-	public void onDialogPositiveClick(DialogFragment dialog) {
+	public void onDialogPositiveClick(DialogFragment dialog, Map<String, String> new_supplier_data) {
 		// TODO Menangani positive action saat membuka dialog add supplier
-				
-		Toast.makeText(AddDataBarang.this, "Dialog Data : " +dialog.toString(), Toast.LENGTH_LONG).show();
+		
+		String str_nama_toko = new_supplier_data.get("nama_toko").toString();
+		if(!str_nama_toko.equals("") && !list_data_supplier.contains(str_nama_toko)) {
+			list_data_supplier.add(str_nama_toko);
+			
+			spinner_supplier.setAdapter(generateSpinnerAdapter(list_data_supplier));
+			spinner_supplier.setSelection(list_data_supplier.indexOf(str_nama_toko));
+			
+		}
+		
+		Toast.makeText(AddDataBarang.this, "Nama Toko : " + new_supplier_data, Toast.LENGTH_LONG).show();
 		
 	}
 
