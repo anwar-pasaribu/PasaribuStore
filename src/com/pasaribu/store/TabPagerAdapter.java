@@ -7,8 +7,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 public class TabPagerAdapter extends FragmentStatePagerAdapter {
 	
     public TabPagerAdapter(FragmentManager fm) {
+    	//TODO Menangani penyajian Tab 
 		super(fm);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -30,7 +30,6 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
 
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
 		return 3; //No of Tabs
 	}
 

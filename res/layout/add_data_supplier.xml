@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/padding_8dp" >
+
+    <TextView
+        android:id="@+id/lbl_supplier_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_top_lbl"
+        android:text="@string/lable_supplier_name" />
+
+    <EditText
+        android:id="@+id/editText_supplier_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/hint_supplier_name"
+        android:inputType="textPersonName" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/lbl_supplier_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_top_lbl"
+        android:text="@string/lable_supplier_address" />
+
+    <EditText
+        android:id="@+id/editText_supplier_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/hint_supplier_address"
+        android:inputType="textMultiLine" />
+
+    <TextView
+        android:id="@+id/TextView_supplier_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_top_lbl"
+        android:text="@string/lable_supplier_contact" />
+
+    <EditText
+        android:id="@+id/editText_supplier_contact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/hint_supplier_contact"
+        android:inputType="phone" />
+
+</LinearLayout>

@@ -2,6 +2,7 @@ package com.pasaribu.store;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -158,9 +159,24 @@ public class Main extends FragmentActivity {
 				
 		int id = item.getItemId();
 		
-		if (id == R.id.option_setting) {
+		switch (id) {
+		case R.id.option_add_barang:
+			
+			//TODO Membuka activity AddDataBarang tanpa data yang dikirimkan
+			Intent i = new Intent(getBaseContext(), AddDataBarang.class);
+			startActivity(i);
+			
+			break;
+		case R.id.option_setting:
+			
 			displayGui.showAlertDialog("Settings",	"Setting di pilih\nKarena belum ada isi\tMemeriksa format stringnya");
+
+			break;
+		default:
+			break;
 		}
+		
+		
 		return super.onOptionsItemSelected(item);
 	}
     

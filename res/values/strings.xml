@@ -23,6 +23,17 @@
     <string name="lable_product_description">Deskripsi Barang</string>
     <string name="hint_product_description">Deksripsi Barang</string>
     <string name="option_add_barang">Tambah Barang</string>
-	<string name="image_button_description">Image Button</string>
-    
+    <string name="image_button_description">Image Button</string>
+    <string name="title_add_data_barang">Tambah Data Barang</string>
+    <string name="lable_product_stock">Jumlah Barang</string>
+    <string name="hint_product_price">Harga</string>
+    <string name="lable_supplier_name">Nama</string>
+    <string name="hint_supplier_name">Nama Toko</string>
+    <string name="lable_supplier_address">Alamat Toko</string>
+    <string name="hint_supplier_address">Alamat Toko</string>
+    <string name="lable_supplier_contact">Kontak</string>
+    <string name="hint_supplier_contact">Nomor Telepon</string>
+    <string name="btn_add">Tambah</string>
+    <string name="btn_cancel">Batal</string>
+
 </resources>

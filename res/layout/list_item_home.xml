@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginStart="@dimen/margin_16dp"
         android:adjustViewBounds="true"
         android:contentDescription="@string/image_button_description"
         android:maxWidth="20dp"
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="@dimen/margin_8dp"
         android:layout_toEndOf="@+id/image_status_favorite"
         android:contentDescription="@string/image_button_description"
         android:src="@drawable/ic_launcher" />
@@ -33,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/image_status_favorite"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/margin_8dp"
         android:layout_toEndOf="@+id/image_product"
         android:text="Nama Product Yang Sangat Panjang"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -68,14 +68,14 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/text_product_price"
         android:layout_alignBottom="@+id/text_product_price"
-        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginStart="@dimen/margin_16dp"
         android:layout_toEndOf="@+id/text_product_price"
         android:text="140 Kotak - 20 Mei 2014"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <ImageButton
         android:id="@+id/btn_more_option"
-        android:layout_width="wrap_content"
+        android:layout_width="20dp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
@@ -83,6 +83,7 @@
         android:layout_marginEnd="@dimen/margin_8dp"
         android:layout_marginTop="@dimen/margin_8dp"
         android:background="@drawable/ic_overflow"
-        android:contentDescription="@string/image_button_description" />
+        android:contentDescription="@string/image_button_description"
+        android:src="@drawable/ic_overflow" />
 
 </RelativeLayout>

@@ -4,45 +4,54 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.accounts.NetworkErrorException;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.pasaribu.store.control.AppsController;
+import com.pasaribu.store.control.CustonJsonObjectRequest;
 import com.pasaribu.store.control.GetCloudData;
 import com.pasaribu.store.model_data.Barang;
 import com.pasaribu.store.model_data.ListRecentlyProduct;
 import com.pasaribu.store.view.CustomListHome;
+import com.pasaribu.store.view.DisplayGui;
 
 public class Home extends Fragment {
 	
 	// from androidhive.com -start- //
 	
 	protected static final String TAG = Home.class.getSimpleName();
-	protected static final String JSON_HEADER = "barang";
-	// These tags will be used to cancel the requests
-	private String tag_json_obj = "jobj_req";
 	private ProgressDialog pDialog;
 	
-	// from androidhive.com -end- //
-	
+	private String URL_DATA 	= "http://192.168.56.5/pasaribu_store/function/getDataBarang.php"; //Hanya utk kebutuhan belajar
+	private String JSON_HEADER_BARANG 	= "BARANG"; //jenis kepala json
+	private String JSON_HEADER_DATA_SIZE = "DATA_BARANG_SIZE";
+	private String tag_json_obj = "jobj_data_home_req";
 	
 	private List<Barang> DataBarang_home = new ArrayList<Barang>();
 	private List<ListRecentlyProduct> DataBarang_recently = new ArrayList<ListRecentlyProduct>();
@@ -51,6 +60,7 @@ public class Home extends Fragment {
 	
 	private GetCloudData getCloudData;
 	private CustomListHome customListHome;
+	private DisplayGui displayGui;
 	
 	private AppsController aController;
 	
@@ -66,163 +76,174 @@ public class Home extends Fragment {
 		pDialog.setMessage("Loading...");
 		pDialog.setCancelable(false);
 		
+		
 		aController = (AppsController) getActivity().getApplicationContext();
+		displayGui = new DisplayGui(aController.getMainContext());
 		
 		getCloudData = new GetCloudData(); //Kelas utk memperoleh data utk ditampilkan di Home
 		
 		list_home = (ListView) android.findViewById(R.id.list_home);
 		list_recently = (ListView) android.findViewById(R.id.list_recently);
 		
-		populateListDataBarang();
-		makeJsonObjReq();
+		requestAllDataBarangJSONObject();
 	    
-	    Log.i(TAG, "Setelah memanggil makeJsonObjectRequest :)");
+		Log.d(TAG, "Setelah Panggilan populateListDataBarang() ");
 		
 		return android;
 	}
 	
-	//Methode Kosong
-	public void populateListDataBarang() {
-//		
-//		//Menjalankan proses pengambilan data
-//		//Hanya bisa dipanggil sekali (ERROR jika tidak)
-////        getCloudData.execute(); 
-////        
-////        //Memperoleh data dari proses asynctask
-////	    try {
-////	    	//TODO Menyalin data "barang" full ke variable aController agar bisa di akses pada activity yang lain
-////			this.DataBarang_home = getCloudData.get();			
-////			int data_size = DataBarang_home.size();
-////			for(int i = 0; i < data_size; i++) {
-////				aController.setBarang(DataBarang_home.get(i));
-////			}
-////			
-////		} catch (InterruptedException e) {
-////			e.printStackTrace();
-////		} catch (ExecutionException e) {
-////			e.printStackTrace();
-////		} finally {
-////			Toast.makeText(
-////					getActivity(), 
-////					"Ukuran Data Barang : " + aController.getBarangArrayListSize(), 
-////					Toast.LENGTH_LONG
-////					).show();
-////		}	    
-////	    
-////	    customListHome = new CustomListHome(getActivity(), aController.getAllBarangList());
-////	    list_home.setAdapter(customListHome);
-//	    
-//	    
-//	    makeJsonObjReq();
-//	    
-//	    Log.i(TAG, "Setelah memanggil makeJsonObjectRequest :)");
-//	    
-	}
-	
-	 //from androidhive.com -start- //
-	private void makeJsonObjReq() {
-		
-		Log.i(TAG, "Memanggil makeJsonObjectRequest :)");
+	//from androidhive.com -start- //
+	public void requestAllDataBarangJSONObject() {	
 		
 		showProgressDialog();
-		JsonObjectRequest jsonObjReq = new JsonObjectRequest(
-				Method.GET,
-				"http://192.168.56.5/pasaribu_store/function/getDataBarang.php", 
-				null,
+		
+		Map<String, String> data_request = new HashMap<String, String>();
+		data_request.put("id_barang", "1");
+		data_request.put("nama_barang", "Lampu Hannocs");
+		data_request.put("merek_barang", "Hannocs");
+		data_request.put("harga_barang", "45000");
+		data_request.put("stok_barang", "200");
+		data_request.put("satuan_barang", "Kotak");
+		data_request.put("kategori_barang", "Elektronik");
+		data_request.put("nama_penjual", "Hikmah Jaya");
+		data_request.put("deskripsi_barang", "Lampu dengan garansi 1 tahun");
+		
+		Log.i(TAG, "Data Request : " + data_request.toString());
+		
+		CustonJsonObjectRequest jsonObjReq = new CustonJsonObjectRequest(
+				Method.POST,
+				URL_DATA, 
+				data_request, 
 				new Response.Listener<JSONObject>() {
-
+	
 					@Override
 					public void onResponse(JSONObject response) {
-						Log.d(TAG, response.toString());
 						
-						//TODO Olah JSONObject data, respon dari pemanggilan
-				    	try {
-				    		JSONObject jsonResponse = new JSONObject(response.toString());
-							//JSONArray jArray 		= new JSONArray(result);
-				    		JSONArray jArray 		= jsonResponse.getJSONArray(JSON_HEADER);
-							
-				    		Log.i("DataJSJONResponse", "DataJSJONResponse : " + jsonResponse.toString());
-				    		Log.i("DataJSJONArray", "DataJSJONArray : " + jArray.toString());
-				    		
-							//TODO: Untuk mengambil data dari JSONArray
-							for (int i = 0; i < jArray.length(); i++ ) {
+						//Cek Header Data JSON
+						if(response.isNull(JSON_HEADER_BARANG) && response.isNull(JSON_HEADER_DATA_SIZE) ) {
+							try {
 								
-								JSONObject jsonObject = jArray.getJSONObject(i);
-								
-								//Menyimpan data ke Data Structure dataBarang (ke dalam List<Barang>)
-								aController.setBarang(new Barang(
-										jsonObject.getInt(Barang.ID_BARANG), 
-										jsonObject.getInt(Barang.ID_MEREK), 
-										jsonObject.getInt(Barang.ID_PENJUAL), 
-										jsonObject.getInt(Barang.ID_GAMBAR), 
-										jsonObject.getString(Barang.NAMA_BARANG), 
-										jsonObject.getInt(Barang.STOK_BARANG), 
-										jsonObject.getString(Barang.SATUAN_BARANG), 
-										jsonObject.getInt(Barang.HARGA_BARANG), 
-										jsonObject.getString(Barang.TGL_HARGA_STOK_BARANG), 
-										jsonObject.getString(Barang.KODE_BARANG), 
-										jsonObject.getString(Barang.LOKASI_BARANG), 
-										jsonObject.getString(Barang.KATEGORI_BARANG), 
-										jsonObject.getString(Barang.DESKRIPSI_BARANG), 
-										jsonObject.getInt(Barang.FAVORITE) 
-										));								
-												
-							}
+								String msg = response.getString("msg");
+								showAlertDialog("Network Database Error ", msg + ", but can't access network database.\nPlease check network connectivity, or please try again");
 
-							
-						} catch (Exception e) {
-							Log.e(TAG, "Fail : Tidak dapat mengambil data JSON");
+							} catch (JSONException e) {
+								e.printStackTrace();
+								Log.e(TAG, e.getMessage());
+							}
+						} else {						
+							parseJSONObject(response);
+							populateListDataBarang();
 						}
 						
-						
-						//Toast.makeText(getActivity(), response.toString(), Toast.LENGTH_SHORT).show();
-						
 						hideProgressDialog();
 					}
-				}, new Response.ErrorListener() {
-
+				}, new Response.ErrorListener() {	
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						VolleyLog.d(TAG, "Error: " + error.getMessage());
+						VolleyLog.d(TAG, "Error: " + error.toString());
+						Log.e(TAG, "ErrorResponse : " + error.toString());
 						hideProgressDialog();
+						
 					}
-				}) {
+				}){};
+	
+		// Adding request to request queue
+		AppsController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);		
+		
+		} 	
+		//from androidhive.com -end- //
+	
+	
+	public void populateListDataBarang()  {	
+		
+		//TODO input data ke AppsController utk bisa di akses pada Activity lain
+		int data_size = DataBarang_home.size();
+		for(int i = 0; i < data_size; i++) {
+			aController.setBarang(DataBarang_home.get(i));
+		}
+		
+		if(data_size <= 0) {			
+	
+			List<String> data_list_recently = new ArrayList<String>();
+		    data_list_recently.add("No Data Found!");
+		    
+		    ArrayAdapter<String> newAdapter = new ArrayAdapter<String> (
+		    		getActivity(), 
+		    		android.R.layout.simple_list_item_1,
+		    		data_list_recently
+		    		);
+		    list_home.setAdapter(newAdapter);
+		    
+		} else {
+			list_home.setAdapter(null);
+			//TODO Set Adapter utk list_home. List barang diperoleh dari aController.
+			customListHome = new CustomListHome(getActivity(), aController.getAllBarangList());
+			list_home.setAdapter(customListHome);
+		}
+		
+	}
 
-			/**
-			 * Passing some request headers
-			 * */
-			@Override
-			public Map<String, String> getHeaders() throws AuthFailureError {
-				HashMap<String, String> headers = new HashMap<String, String>();
-				headers.put("Content-Type", "application/json");
-				return headers;
+	public void parseJSONObject(JSONObject responseJsonObject) {
+		
+		//TODO Olah JSONObject data, jika pemanggilan Volley normal
+    	try {
+    		
+    		JSONObject jsonResponse = new JSONObject(responseJsonObject.toString());    		
+    		int data_barang_size = jsonResponse.getInt(JSON_HEADER_DATA_SIZE);
+    		JSONArray jArray_DataBarang = jsonResponse.getJSONArray(JSON_HEADER_BARANG);
+    		
+			//TODO: Untuk mengambil data dari JSONArray
+    		int jArrayLength = jArray_DataBarang.length();
+			for (int i = 0; i < jArrayLength; i++ ) {
+				
+				JSONObject jsonObject = jArray_DataBarang.getJSONObject(i);
+				
+				//Menyimpan data ke Data Structure dataBarang (ke dalam List<Barang>)
+				DataBarang_home.add(new Barang(
+						jsonObject.getInt(Barang.ID_BARANG), 
+						jsonObject.getInt(Barang.ID_MEREK), 
+						jsonObject.getInt(Barang.ID_PENJUAL), 
+						jsonObject.getInt(Barang.ID_GAMBAR), 
+						jsonObject.getString(Barang.NAMA_BARANG), 
+						jsonObject.getInt(Barang.STOK_BARANG), 
+						jsonObject.getString(Barang.SATUAN_BARANG), 
+						jsonObject.getInt(Barang.HARGA_BARANG), 
+						jsonObject.getString(Barang.TGL_HARGA_STOK_BARANG), 
+						jsonObject.getString(Barang.KODE_BARANG), 
+						jsonObject.getString(Barang.LOKASI_BARANG), 
+						jsonObject.getString(Barang.KATEGORI_BARANG), 
+						jsonObject.getString(Barang.DESKRIPSI_BARANG), 
+						jsonObject.getInt(Barang.FAVORITE) 
+						));								
+								
 			}
 
-//			@Override
-//			protected Map<String, String> getParams() {
-//				Map<String, String> params = new HashMap<String, String>();
-//				params.put("name", "Androidhive");
-//				params.put("email", "abc@androidhive.info");
-//				params.put("pass", "password123");
-//
-//				return params;
-//			}
-
-		};
-
-		// Adding request to request queue
-		AppsController.getInstance().addToRequestQueue(jsonObjReq,
-				tag_json_obj);
-
-		// Cancelling request
-		// ApplicationController.getInstance().getRequestQueue().cancelAll(tag_json_obj);		
-	
-		//TODO Set Adapter utk list_home
-		customListHome = new CustomListHome(getActivity(), aController.getAllBarangList());
-	    list_home.setAdapter(customListHome);
-	
+			Log.i(TAG, "JSON Response : " + jsonResponse.toString());
+			Log.i(TAG, "Data Barang Size : " + data_barang_size);
+			Log.i(TAG, "Data Barang Array : " + jArray_DataBarang.toString());
+			
+			
+		} catch (Exception e) {
+			Log.e(TAG, "Fail : Tidak dapat mengambil data JSON. Message : " + e.getMessage());
+		}
 	}
 	
+	
+	 public void showAlertDialog(String title, String message) {		
+		
+		new AlertDialog.Builder(getActivity())
+		.setTitle(title)
+		.setMessage(message)
+		.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				//TODO Lakukan pengambilan database offline (SQLite)
+			}
+		}).show();
+		
+	}
+
 	private void showProgressDialog() {
 		if (!pDialog.isShowing())
 			pDialog.show();
@@ -232,8 +253,5 @@ public class Home extends Fragment {
 		if (pDialog.isShowing())
 			pDialog.hide();
 	}
-	
-	 //from androidhive.com -end- //
-
 	
 }

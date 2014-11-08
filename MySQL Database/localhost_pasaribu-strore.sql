@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `barang` (
 --
 
 INSERT INTO `barang` (`id_barang`, `id_user`, `id_merek`, `id_penjual`, `id_gambar`, `nama_barang`, `stok_barang`, `satuan_barang`, `harga_barang`, `tgl_harga_stok_barang`, `kode_barang`, `lokasi_barang`, `kategori_barang`, `deskripsi_barang`, `favorite`) VALUES
-(1, 1, 4, 2, 2, 'Lampu Depan V.R New', 20, 'kotak', 60000, '2014-07-22', '', '', 'automotif', 'Lampu Depan V.R New dengan kualitas prima', 1);
+(1, 1, 4, 2, 2, 'Lampu Depan V.R New', 20, 'kotak', 60000, '2014-07-22', '', '', 'automotif', 'Lampu Depan V.R New dengan kualitas prima', 1), (2, 1, 1, 1, 2, 'Samsung 4K TV', 3, 'unit', 80000000, '2014-11-05', 'TV-S4K', '', 'elektronik', 'TV dengan ketajaman layar mengagumkan dengan resolusi UHD (4K), rasakan sensasi menonton iMax di rumah Anda.', 0);
 
 -- --------------------------------------------------------
 

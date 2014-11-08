@@ -1,94 +1,90 @@
 package com.pasaribu.store.control;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request.Method;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.pasaribu.store.model_data.Barang;
 
-public class GetCloudData extends AsyncTask<String, Integer, List<Barang> > {
-
+public class GetCloudData {
+	
 	//Kumpulan tag utk keperluan debugging
-	private String TAG_GET = "Get_cloud_data";
-	private String TAG_PROCESS_ERROR = "GetCloudData_ERROR";
-	private String TAG_PROCESS_RUNNING = "GetCloudData_RUNNING";
+	private String TAG_GET = GetCloudData.class.getSimpleName();	
 	
 	private List<Barang> dataBarang = new ArrayList<Barang>();
+	private JSONObject jsonObject;
 	
 	private String URL_DATA 	= "http://192.168.56.5/pasaribu_store/function/getDataBarang.php"; //Hanya utk kebutuhan belajar
 	private String JSON_HEADER 	= "barang"; //jenis kepala json
-	
+	private String tag_json_obj = "jobj_req";	
 	
 	public GetCloudData() {
 		Log.i(TAG_GET, "Memulai Constructor GetCloudData ");
 		
 	}
 	
+	//from androidhive.com -start- //
+	public void requestAllDataBarangJSONObject() {			
+			
+		JsonObjectRequest jsonObjReq = new JsonObjectRequest(
+				Method.GET,
+				URL_DATA, 
+				null,
+				new Response.Listener<JSONObject>() {
 	
-
-	@Override
-	protected List<Barang> doInBackground(String... params) {
-		// TODO Mengambil Data Barang pada Database MySQL
-		
-		
-		String 		result 	= "";			//Menyimpan JSON String data yang diambil dari MySQL Database    	
-    	InputStream isr 	= null;
-    	    	
-    	
-    	try {
-			HttpClient httpClient 	= new DefaultHttpClient();
-			HttpPost httpPost		= new HttpPost(URL_DATA);
-			HttpResponse response	= httpClient.execute(httpPost);
-			HttpEntity entity		= response.getEntity();
-			isr						= entity.getContent();
+					@Override
+					public void onResponse(JSONObject response) {
+						
+						manageJsonObject(response);
+						
+					}
+				}, new Response.ErrorListener() {
+	
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						VolleyLog.d(TAG_GET, "Error: " + error.getMessage());
+					}
+				})
+		{
 			
-		} catch (Exception e) {
-			Log.e(TAG_PROCESS_ERROR, "Fail 1 : Tidak Bisa Proses Http");
-			
-		}
-    	
-    	//TODO: Mengubah respon dari proses http menjadi string
-    	try {
-			BufferedReader reader 	= new BufferedReader(new InputStreamReader(isr, "iso-8859-1"), 8);
-			StringBuilder sb		= new StringBuilder();
-			String line 			= null;
-			
-			while ( (line = reader.readLine()) != null ) {
-				sb.append(line + "\n");
+			//Passing some request headers				 
+			@Override
+			public Map<String, String> getHeaders() throws AuthFailureError {
+				HashMap<String, String> headers = new HashMap<String, String>();
+				headers.put("Content-Type", "application/json");
+				return headers;
 			}
-			
-			isr.close();
-			
-			result = sb.toString();
-			
-		} catch (Exception e) {
-			Log.e(TAG_PROCESS_ERROR, "Fail 2 : Tidak bisa mengubah respon menjadi string");	
-		}
-    	
-    	//TODO: mengambil data dari JSON
+		};
+	
+		// Adding request to request queue
+		AppsController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);		
+		
+		} //End of requestAllDataBarangJSONObject()		
+
+	public void parseJSONObject(String jsonString) {
+		
+		//TODO Olah JSONObject data, respon dari pemanggilan
     	try {
-    		JSONObject jsonResponse = new JSONObject(result);
+    		JSONObject jsonResponse = new JSONObject(jsonString);
 			//JSONArray jArray 		= new JSONArray(result);
-    		JSONArray jArray 		= jsonResponse.getJSONArray(JSON_HEADER);
-			
-    		Log.i("DataJSJONResponse", "DataJSJONResponse : " + jsonResponse.toString());
-    		Log.i("DataJSJONArray", "DataJSJONArray : " + jArray.toString());
+    		JSONArray jArray 		= jsonResponse.getJSONArray(JSON_HEADER);		
+    		
     		
 			//TODO: Untuk mengambil data dari JSONArray
-			for (int i = 0; i < jArray.length(); i++ ) {
+    		int jArrayLength = jArray.length();
+			for (int i = 0; i < jArrayLength; i++ ) {
 				
 				JSONObject jsonObject = jArray.getJSONObject(i);
 				
@@ -108,37 +104,50 @@ public class GetCloudData extends AsyncTask<String, Integer, List<Barang> > {
 						jsonObject.getString(Barang.KATEGORI_BARANG), 
 						jsonObject.getString(Barang.DESKRIPSI_BARANG), 
 						jsonObject.getInt(Barang.FAVORITE) 
-						));
-				
-				publishProgress(i);
+						));								
 								
 			}
 
+			Log.i(TAG_GET, "DataJSJONArray : " + jArray.toString());
+			
 			
 		} catch (Exception e) {
-			Log.e(TAG_PROCESS_ERROR, "Fail 3 : Tidak dapat mengambil data JSON");
+			Log.e(TAG_GET, "Fail : Tidak dapat mengambil data JSON");
 		}
-    	
-		return dataBarang;		
-		
-	}
-	
-	@Override
-	protected void onProgressUpdate(Integer... values) {
-		super.onProgressUpdate(values);
-		
-		Log.i(TAG_PROCESS_RUNNING, "Data : " + values[0]);
-		
 	}
 
-	@Override
-	protected void onPostExecute(List<Barang> result) {
-		// TODO Hasil proses background
-		this.dataBarang = result;
-		super.onPostExecute(result);
+	public List<Barang> getAllDataBarang() {
+		return this.dataBarang;
+	}
+
+	public int getAllDataBarangArrayListSize() {
+		return this.dataBarang.size();
 	}
 	
+	public JSONObject getJsonObject() {
+		return jsonObject;
+	}
+
+	public void setDataBarang(Barang barang) {
+		this.dataBarang.add(barang);
+	}
+
+	public void manageJsonObject(JSONObject jsonObject) {
+		
+		this.jsonObject = jsonObject;
+		parseJSONObject(jsonObject.toString());
+		
+		Log.i(TAG_GET, "Memanggil setJSONObject Methode : " + getJsonObject().toString() );
+		Log.i(TAG_GET, "Data Barang Setelah di Parse : " + getAllDataBarang().size());
 	
+		for(int i = 0; i < getAllDataBarangArrayListSize(); i++) {
+			Log.i(TAG_GET, "Nama Barang : " + getAllDataBarang().get(i).getNama_barang());
+			Log.i(TAG_GET, "Harga Barang : " + getAllDataBarang().get(i).getHarga_barang());
+
+		}
+	}
+		
+		 //from androidhive.com -end- //
 	
 
 }

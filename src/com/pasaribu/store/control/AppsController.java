@@ -24,7 +24,16 @@ public class AppsController extends Application {
 	//Me create this
 	private Context mainContext;	
 	private List<Barang> barang_data_full = new ArrayList<Barang>();
+	private List<String> list_data_supplier = new ArrayList<String>();
 	
+	public List<String> getList_data_supplier() {
+		return list_data_supplier;
+	}
+
+	public void setList_data_supplier(String list_data_supplier) {
+		this.list_data_supplier.add(list_data_supplier);
+	}
+
 	/* From androidhive.com -start- */
 	@Override
 	public void onCreate() {
