@@ -95,14 +95,14 @@ public class Home extends Fragment {
 		
 		Map<String, String> data_request = new HashMap<String, String>();
 		data_request.put("id_barang", "1");
-		data_request.put("nama_barang", "Lampu Hannocs");
-		data_request.put("merek_barang", "Hannocs");
-		data_request.put("harga_barang", "45000");
-		data_request.put("stok_barang", "200");
-		data_request.put("satuan_barang", "Kotak");
-		data_request.put("kategori_barang", "Elektronik");
-		data_request.put("nama_penjual", "Hikmah Jaya");
-		data_request.put("deskripsi_barang", "Lampu dengan garansi 1 tahun");
+//		data_request.put("nama_barang", "Lampu Hannocs");
+//		data_request.put("merek_barang", "Hannocs");
+//		data_request.put("harga_barang", "45000");
+//		data_request.put("stok_barang", "200");
+//		data_request.put("satuan_barang", "Kotak");
+//		data_request.put("kategori_barang", "Elektronik");
+//		data_request.put("nama_penjual", "Hikmah Jaya");
+//		data_request.put("deskripsi_barang", "Lampu dengan garansi 1 tahun");
 		
 		Log.i(TAG, "Data Request : " + data_request.toString());
 		
