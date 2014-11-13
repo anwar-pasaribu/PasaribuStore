@@ -101,7 +101,7 @@
             <EditText
                 android:id="@+id/editText_product_stock"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="5"
                 android:ems="10"
                 android:hint="@string/hint_product_stock"
@@ -110,7 +110,7 @@
             <AutoCompleteTextView
                 android:id="@+id/autoComp_product_unit"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="5"
                 android:ems="10"
                 android:hint="@string/hint_product_unit"

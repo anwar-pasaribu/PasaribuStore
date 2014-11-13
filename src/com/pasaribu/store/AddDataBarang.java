@@ -5,8 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -23,8 +27,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.Request.Method;
 import com.pasaribu.store.control.AppsController;
-import com.pasaribu.store.view.DialogAddSupplier;
+import com.pasaribu.store.control.CustonJsonObjectRequest;
+import com.pasaribu.store.model_data.AppsConstanta;
 
 public class AddDataBarang extends Activity 
 	implements 	OnItemSelectedListener, 
@@ -32,7 +41,9 @@ public class AddDataBarang extends Activity
 				DialogAddSupplier.DialogAddSupplierListener{
 	
 	final String TAG = AddDataBarang.class.getSimpleName();
+	private String tag_add_data_barang = "proses_data_barang"; //Tag proses Volley, 
 	
+	private ProgressDialog pDialog;
 	private AppsController aController;
 	
 	//Form 
@@ -67,6 +78,7 @@ public class AddDataBarang extends Activity
 
 	private String kategori;
 	
+	
 	//private DialogAddSupplier dialodAddSupplier;
 
 	@Override
@@ -95,6 +107,12 @@ public class AddDataBarang extends Activity
 		spinner_supplier = (Spinner) findViewById(R.id.spinner_supplier);
 		
 		btn_add_supplier = (Button) findViewById(R.id.btn_add_supplier);
+		
+		//Progress Dialog Initialization
+		//Inisialisasi Progress Dialog Box
+		pDialog = new ProgressDialog(AddDataBarang.this);
+		pDialog.setMessage("Loading...");
+		pDialog.setCancelable(false);
 		
 		
 		
@@ -198,10 +216,10 @@ public class AddDataBarang extends Activity
 		int id_spinner = parent.getId();
 	
 		switch (id_spinner) {
-		case R.id.spinner_product_category:
+		case R.id.spinner_product_category: //Menerima aksi dari spinner/dropdown kategori produk
 			supplier = parent.getItemAtPosition(position).toString();
 			break;
-		case R.id.spinner_supplier:
+		case R.id.spinner_supplier: //Menerima kasi dari spinner Toko penyedia barang
 			kategori = parent.getItemAtPosition(position).toString();
 			break;
 		default:
@@ -230,7 +248,7 @@ public class AddDataBarang extends Activity
 		switch (id) {
 		case R.id.btn_add_supplier:
 			
-			//TODO Jika mengklik tombol Tambah Penjual
+			//TODO Jika mengklik tombol Tambah Penjual, dialog akan dibuka
 			final DialogFragment dialogAddSupplier = new DialogAddSupplier();
 			dialogAddSupplier.show(getFragmentManager(), "add_supplier");
 			
@@ -244,14 +262,23 @@ public class AddDataBarang extends Activity
 
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog, Map<String, String> new_supplier_data) {
-		// TODO Menangani positive action saat membuka dialog add supplier
+		// TODO Menangani positive action saat membuka dialog add supplier.
+		// Data yg diperoleh adalah 
 		
-		String str_nama_toko = new_supplier_data.get("nama_toko").toString();
+		String str_nama_toko = new_supplier_data.get(AppsConstanta.KEY_NAMA_TOKO).toString();
+		String str_alamat_toko = new_supplier_data.get(AppsConstanta.KEY_ALAMAT_TOKO).toString();
+		String str_kontak_toko = new_supplier_data.get(AppsConstanta.KEY_KONTAK_TOKO).toString();
+		
 		if(!str_nama_toko.equals("") && !list_data_supplier.contains(str_nama_toko)) {
-			list_data_supplier.add(str_nama_toko);
 			
+			//TODO Tambah data ke database MySQL
+			JSONObjectAccess(AppsConstanta.URL_SUPPLIER, new_supplier_data);
+			
+			//Update tampilan pada Spinner "Penjual"
+			list_data_supplier.add(str_nama_toko);			
 			spinner_supplier.setAdapter(generateSpinnerAdapter(list_data_supplier));
 			spinner_supplier.setSelection(list_data_supplier.indexOf(str_nama_toko));
+			
 			
 		}
 		
@@ -265,4 +292,76 @@ public class AddDataBarang extends Activity
 		
 		Toast.makeText(AddDataBarang.this, "Negatif : " + dialog.toString(), Toast.LENGTH_LONG).show();
 	}
+	
+	//TODO Utk akses data di server MySQL
+	public void JSONObjectAccess(String URL, Map<String, String> data_to_send) {	
+		
+		showProgressDialog();
+		
+		
+		
+		Log.i(TAG, "Data Request : " + data_to_send.toString());
+		
+		CustonJsonObjectRequest jsonObjReq = new CustonJsonObjectRequest(
+				Method.POST,
+				URL, 
+				data_to_send, 
+				new Response.Listener<JSONObject>() {
+	
+					@Override
+					public void onResponse(JSONObject response) {
+						
+					//TODO Olah respon data dari server berdasarkan URL yang dimasukkan
+						
+					//Kasus renspon data supplier sudah berhasil di tambah, dengan memeriksa header json
+					//Apakah sudah terdapat header last_id nya kemudia periksa apakah tidak 0
+					//Karena kondisi 0, berarti data tidak berhasil di masukkan.
+					if(!response.isNull(AppsConstanta.JSON_HEADER_LAST_INSERTED_ID) ) {
+
+						try {
+							
+							int last_inserted_id = response.getInt(AppsConstanta.JSON_HEADER_LAST_INSERTED_ID);
+							
+							if(last_inserted_id != 0) {
+								//TODO Lakukan jika berhasil input data ke MySQL database
+							}
+							
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+						
+					}
+						
+						
+						hideProgressDialog();
+					}
+				}, new Response.ErrorListener() {	
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						
+						VolleyLog.d(TAG, "Error: " + error.toString());
+						Log.e(TAG, "ErrorResponse : " + error.toString());
+						hideProgressDialog();
+						
+						
+					}
+				}){};
+	
+		// Adding request to request queue
+		AppsController.getInstance().addToRequestQueue(jsonObjReq, tag_add_data_barang);		
+		
+		} 
+
+		private void showProgressDialog() {
+			if (!pDialog.isShowing())
+				pDialog.show();
+		}
+		
+		private void hideProgressDialog() {
+			if (pDialog.isShowing())
+				pDialog.hide();
+		}
+
+	
+	
 }
