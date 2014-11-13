@@ -28,6 +28,7 @@ import com.android.volley.VolleyLog;
 import com.pasaribu.store.control.AppsController;
 import com.pasaribu.store.control.CustonJsonObjectRequest;
 import com.pasaribu.store.control.GetCloudData;
+import com.pasaribu.store.model_data.AppsConstanta;
 import com.pasaribu.store.model_data.Barang;
 import com.pasaribu.store.model_data.ListRecentlyProduct;
 import com.pasaribu.store.view.CustomListHome;
@@ -40,9 +41,12 @@ public class Home extends Fragment {
 	protected static final String TAG = Home.class.getSimpleName();
 	private ProgressDialog pDialog;
 	
-	private String URL_DATA 	= "http://192.168.56.5/pasaribu_store/function/getDataBarang.php"; //Hanya utk kebutuhan belajar
-	private String JSON_HEADER_BARANG 	= "BARANG"; //jenis kepala json
-	private String JSON_HEADER_DATA_SIZE = "DATA_BARANG_SIZE";
+	//URL_DATA pindah ke 
+	//private String URL_DATA 	= "http://192.168.56.5/pasaribu_store/function/getDataBarang.php"; //Hanya utk kebutuhan belajar
+	
+	//Var ini dipindahkan ke AppsConstanta.java
+		//private String JSON_HEADER_BARANG 	= "BARANG"; //jenis kepala json
+		//private String JSON_HEADER_DATA_SIZE = "DATA_BARANG_SIZE";
 	private String tag_json_obj = "jobj_data_home_req";
 	
 	private List<Barang> DataBarang_home = new ArrayList<Barang>();
@@ -104,7 +108,7 @@ public class Home extends Fragment {
 		
 		CustonJsonObjectRequest jsonObjReq = new CustonJsonObjectRequest(
 				Method.POST,
-				URL_DATA, 
+				AppsConstanta.URL_DATA, 
 				data_request, 
 				new Response.Listener<JSONObject>() {
 	
@@ -112,7 +116,7 @@ public class Home extends Fragment {
 					public void onResponse(JSONObject response) {
 						
 						//Cek Header Data JSON
-						if(response.isNull(JSON_HEADER_BARANG) && response.isNull(JSON_HEADER_DATA_SIZE) ) {
+						if(response.isNull(AppsConstanta.JSON_HEADER_BARANG) && response.isNull(AppsConstanta.JSON_HEADER_DATA_SIZE) ) {
 							try {
 								
 								String msg = response.getString("msg");
@@ -181,8 +185,8 @@ public class Home extends Fragment {
     	try {
     		
     		JSONObject jsonResponse = new JSONObject(responseJsonObject.toString());    		
-    		int data_barang_size = jsonResponse.getInt(JSON_HEADER_DATA_SIZE);
-    		JSONArray jArray_DataBarang = jsonResponse.getJSONArray(JSON_HEADER_BARANG);
+    		int data_barang_size = jsonResponse.getInt(AppsConstanta.JSON_HEADER_DATA_SIZE);
+    		JSONArray jArray_DataBarang = jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BARANG);
     		
 			//TODO: Untuk mengambil data dari JSONArray
     		int jArrayLength = jArray_DataBarang.length();
