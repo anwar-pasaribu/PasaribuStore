@@ -1,10 +1,12 @@
 package com.pasaribu.store;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,6 +36,9 @@ import com.android.volley.Request.Method;
 import com.pasaribu.store.control.AppsController;
 import com.pasaribu.store.control.CustonJsonObjectRequest;
 import com.pasaribu.store.model_data.AppsConstanta;
+import com.pasaribu.store.model_data.Barang;
+import com.pasaribu.store.model_data.Brand;
+import com.pasaribu.store.model_data.Supplier;
 
 public class AddDataBarang extends Activity 
 	implements 	OnItemSelectedListener, 
@@ -72,7 +77,7 @@ public class AddDataBarang extends Activity
 	private List<String> list_data_category = new ArrayList<String>();
 	private List<String> list_data_supplier = new ArrayList<String>();
 	private List<String> list_data_product_unit = new ArrayList<String>();
-	private List<String> list_data_product_brand = new ArrayList<String>();
+	private List<String> list_data_brand = new ArrayList<String>();
 
 	private String supplier;
 
@@ -132,11 +137,14 @@ public class AddDataBarang extends Activity
 		list_data_category.add("Automotif");
 		list_data_category.add("Lainnya");
 		
-		list_data_supplier.add("Hikmah Jaya");
-		list_data_supplier.add("Bintang Motor");
-		list_data_supplier.add("Sumatera Diesel");
-		list_data_supplier.add("Sumatera Tehnik");
-		list_data_supplier.add("Zaman Baru");
+		//Diganti : data jadi diambil dari database MYsQL
+		//getSpinner data utk SEMENTARA mengambil data SUPPLIER dan BRAND
+		getSpinnerData();
+//		list_data_supplier.add("Hikmah Jaya");
+//		list_data_supplier.add("Bintang Motor");
+//		list_data_supplier.add("Sumatera Diesel");
+//		list_data_supplier.add("Sumatera Tehnik");
+//		list_data_supplier.add("Zaman Baru");
 		
 		list_data_product_unit.add("Kotak");
 		list_data_product_unit.add("Lusin");
@@ -146,23 +154,30 @@ public class AddDataBarang extends Activity
 		list_data_product_unit.add("Buah");
 		list_data_product_unit.add("Plastik");
 		
-		list_data_product_brand.add("Samsung");
-		list_data_product_brand.add("LG");
-		list_data_product_brand.add("Hannocs");
-		list_data_product_brand.add("Hitachi");
-		list_data_product_brand.add("Aspira");
-		list_data_product_brand.add("Dunlop");
+//		list_data_brand.add("Samsung");
+//		list_data_brand.add("LG");
+//		list_data_brand.add("Hannocs");
+//		list_data_brand.add("Hitachi");
+//		list_data_brand.add("Aspira");
+//		list_data_brand.add("Dunlop");
 		
 		
 		spinner_product_category.setAdapter(generateSpinnerAdapter(list_data_category));
-		spinner_supplier.setAdapter(generateSpinnerAdapter(list_data_supplier));
+		//spinner_supplier.setAdapter(generateSpinnerAdapter(list_data_supplier));
 		autoComp_product_unit.setAdapter(generateSpinnerAdapter(list_data_product_unit));
-		autoComp_product_brand.setAdapter(generateSpinnerAdapter(list_data_product_brand));
+		//autoComp_product_brand.setAdapter(generateSpinnerAdapter(list_data_brand));
 		
 		
 	}
 	
-	public ArrayAdapter<String> generateSpinnerAdapter (List<String> list_data) {
+	private void getSpinnerData() {
+		// TODO Mengisi data ke Spinner (Supplier dan Brand)
+		Log.i(TAG, "Memperoleh Spinner data.");
+		JSONObjectAccess(AppsConstanta.URL_SUPPLIER_AND_BRAND, null);		
+		
+	}
+
+	private ArrayAdapter<String> generateSpinnerAdapter (List<String> list_data) {
 		
 		ArrayAdapter<String> adapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_item, list_data);
 		adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
@@ -185,9 +200,8 @@ public class AddDataBarang extends Activity
 		switch (id) {
 		case R.id.option_done_adding:
 			
-			//TODO aksi menyimpan data ke SQLite, ke MySQL jika online
-			Map<String, String> data_barang_to_send = new HashMap<String, String>();
-			data_barang_to_send.put("nama_barang", "Babi");	
+			//TODO aksi menyimpan data ke SQLite, ke MySQL jika online			
+			getFormDataAndSend();
 			
 			break;
 			
@@ -204,6 +218,65 @@ public class AddDataBarang extends Activity
 		}
 		
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void getFormDataAndSend() {
+		// TODO Memperoleh seluruh data dari form
+		
+		String product_name = editText_product_name.getText().toString();		
+		int product_brand_id = 0;
+		String product_brand = autoComp_product_brand.getText().toString(); //TODO Kejanggalan utk database
+		String product_price = editText_product_price.getText().toString();
+		String product_stock = editText_product_stock.getText().toString();
+		String product_unit = autoComp_product_unit.getText().toString();
+		String product_category = spinner_product_category.getSelectedItem().toString();
+		String product_supplier = spinner_supplier.getSelectedItem().toString();
+		int product_supplier_id = 0;
+		String product_description = editText_product_description.getText().toString();
+		
+		//get product_brand id from nama_merek(product_brand), to send to mysql database
+		int brand_list_size = aController.getList_brand().size();
+		for(int i = 0; i < brand_list_size; i++) {
+			if(aController.getList_brand().get(i).getNama_merek().equals(product_brand)) {
+				product_brand_id = aController.getList_brand().get(i).getId_merek();
+			}
+		}
+		
+		//get product_supplier_id from product_supplier text
+		int supplier_list_size = aController.getList_supplier().size();
+		for(int i = 0; i < supplier_list_size; i++) {
+			if(aController.getList_supplier().get(i).getNama_toko().equals(product_supplier)) {
+				product_supplier_id = aController.getList_supplier().get(i).getId_penjual();
+			}
+		}
+		
+		//Membuat string tanggal sekarang
+		Calendar now = Calendar.getInstance();
+		int month = now.get(Calendar.MONTH) + 1;
+		int day = now.get(Calendar.DAY_OF_MONTH);
+		int year = now.get(Calendar.YEAR);
+		
+		
+		Map<String, String> data_barang_to_send = new HashMap<String, String>();
+		//Data utk id_barang AUTOINCREMENT di server
+		data_barang_to_send.put(Barang.ID_USER, "1"); //TODO Guna - User Aktif diasumsikan!
+		data_barang_to_send.put(Barang.ID_MEREK, product_brand_id + ""); //Karena Map<String, String>
+		data_barang_to_send.put(Barang.ID_PENJUAL, product_supplier_id + "");
+		data_barang_to_send.put(Barang.ID_GAMBAR, "0"); //TODO Ingat, utk sekarang gambar masih kosong
+		data_barang_to_send.put(Barang.NAMA_BARANG, product_name);
+		data_barang_to_send.put(Barang.STOK_BARANG, product_stock + "");
+		data_barang_to_send.put(Barang.SATUAN_BARANG, product_unit);
+		data_barang_to_send.put(Barang.HARGA_BARANG, product_price);
+		data_barang_to_send.put(Barang.TGL_HARGA_STOK_BARANG, year+"-"+month+"-"+day);
+		data_barang_to_send.put(Barang.KODE_BARANG, "");
+		data_barang_to_send.put(Barang.LOKASI_BARANG, "");
+		data_barang_to_send.put(Barang.KATEGORI_BARANG, product_category);
+		data_barang_to_send.put(Barang.DESKRIPSI_BARANG, product_description);
+		
+		JSONObjectAccess(AppsConstanta.URL_INSERT_PRODUCT, data_barang_to_send);
+		
+		Toast.makeText(this, "Data Berhasil ditambahkan", Toast.LENGTH_LONG).show();
+		
 	}
 
 	//Menangani Seleksi pada spinner
@@ -272,7 +345,7 @@ public class AddDataBarang extends Activity
 		if(!str_nama_toko.equals("") && !list_data_supplier.contains(str_nama_toko)) {
 			
 			//TODO Tambah data ke database MySQL
-			JSONObjectAccess(AppsConstanta.URL_SUPPLIER, new_supplier_data);
+			JSONObjectAccess(AppsConstanta.URL_INSERT_SUPPLIER, new_supplier_data);
 			
 			//Update tampilan pada Spinner "Penjual"
 			list_data_supplier.add(str_nama_toko);			
@@ -294,13 +367,11 @@ public class AddDataBarang extends Activity
 	}
 	
 	//TODO Utk akses data di server MySQL
-	public void JSONObjectAccess(String URL, Map<String, String> data_to_send) {	
-		
-		showProgressDialog();
-		
+	private void JSONObjectAccess(String URL, Map<String, String> data_to_send) {			
+		showProgressDialog();		
 		
 		
-		Log.i(TAG, "Data Request : " + data_to_send.toString());
+		//Log.i(TAG, "Data Request : " + data_to_send.toString());
 		
 		CustonJsonObjectRequest jsonObjReq = new CustonJsonObjectRequest(
 				Method.POST,
@@ -313,9 +384,9 @@ public class AddDataBarang extends Activity
 						
 					//TODO Olah respon data dari server berdasarkan URL yang dimasukkan
 						
-					//Kasus renspon data supplier sudah berhasil di tambah, dengan memeriksa header json
+					//Kasus renspon data supplier/barang(product) sudah berhasil di tambah, dengan memeriksa header json
 					//Apakah sudah terdapat header last_id nya kemudia periksa apakah tidak 0
-					//Karena kondisi 0, berarti data tidak berhasil di masukkan.
+					//Karena kondisi 0, berarti data tidak berhasil di masukkan atau tidak ada perintah insert
 					if(!response.isNull(AppsConstanta.JSON_HEADER_LAST_INSERTED_ID) ) {
 
 						try {
@@ -330,10 +401,14 @@ public class AddDataBarang extends Activity
 							e.printStackTrace();
 						}
 						
+					} else if(!response.isNull(AppsConstanta.JSON_HEADER_SUPPLIER) && !response.isNull(AppsConstanta.JSON_HEADER_BRAND)) {
+						//TODO Jika response data berisi header SUPPLIER dan BRAND, maka proses utk dimasukkan ke Spinner
+						parseJSONData(response);
 					}
 						
 						
-						hideProgressDialog();
+					hideProgressDialog();
+					
 					}
 				}, new Response.ErrorListener() {	
 					@Override
@@ -351,6 +426,66 @@ public class AddDataBarang extends Activity
 		AppsController.getInstance().addToRequestQueue(jsonObjReq, tag_add_data_barang);		
 		
 		} 
+	
+	
+	public void parseJSONData(JSONObject responseJsonObject) {
+		
+			Log.i(TAG, "Parse JSON Data : " + responseJsonObject.toString());
+			//TODO Olah JSONObject data, jika pemanggilan Volley normal
+	    	try {
+	    		
+	    		JSONObject jsonResponse = new JSONObject(responseJsonObject.toString());    		
+	    		JSONArray jArray_SupplierData = jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_SUPPLIER);
+	    		JSONArray jArray_BrandData = jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BRAND);
+	    		
+				//TODO: Untuk mengambil data dari JSONArray Supplier
+	    		int jArray_SupplierDataLength = jArray_SupplierData.length();
+				for (int i = 0; i < jArray_SupplierDataLength; i++ ) {
+					
+					JSONObject jsonObject = jArray_SupplierData.getJSONObject(i);
+					
+					aController.setList_supplier(new Supplier(
+							jsonObject.getInt(Supplier.ID_PENJUAL), 
+							jsonObject.getString(Supplier.NAMA_PENJUAL), 
+							jsonObject.getString(Supplier.NAMA_TOKO), 
+							jsonObject.getString(Supplier.ALAMAT_TOKO), 
+							jsonObject.getString(Supplier.GEOLOCATION), 
+							jsonObject.getString(Supplier.KONTAK_TOKO), 
+							jsonObject.getString(Supplier.EMAIL_TOKO) 
+							));	
+					
+					list_data_supplier.add(jsonObject.getString(Supplier.NAMA_TOKO));
+									
+				}
+				
+				//TODO: Untuk mengambil data dari JSONArray Brand
+	    		int jArray_BrandDataLength = jArray_BrandData.length();
+				for (int i = 0; i < jArray_BrandDataLength; i++ ) {
+					
+					JSONObject jsonObject = jArray_BrandData.getJSONObject(i);
+					
+					aController.setList_brand(new Brand(
+							jsonObject.getInt(Brand.ID_MEREK), 
+							jsonObject.getString(Brand.NAMA_MEREK), 
+							jsonObject.getString(Brand.LOGO_MEREK), 
+							jsonObject.getString(Brand.DESKRIPSI_MEREK) 
+							));	
+					
+					list_data_brand.add(jsonObject.getString(Brand.NAMA_MEREK));
+									
+				}
+				
+				spinner_supplier.setAdapter(generateSpinnerAdapter(list_data_supplier));
+				autoComp_product_brand.setAdapter(generateSpinnerAdapter(list_data_brand));
+				
+				Log.i(TAG, "JSON Response : " + jsonResponse.toString());
+				
+				
+			} catch (Exception e) {
+				Log.e(TAG, "Fail : Tidak dapat mengambil data JSON. Message : " + e.getMessage());
+			}
+		}
+	
 
 		private void showProgressDialog() {
 			if (!pDialog.isShowing())

@@ -12,6 +12,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.pasaribu.store.model_data.Barang;
+import com.pasaribu.store.model_data.Brand;
+import com.pasaribu.store.model_data.Supplier;
 
 public class AppsController extends Application {
 	
@@ -21,19 +23,13 @@ public class AppsController extends Application {
 	private ImageLoader mImageLoader;	
 	private static AppsController mInstance;	
 	
-	//Me create this
+	//Me create this, List yang akan menampung seluruh data
 	private Context mainContext;	
 	private List<Barang> barang_data_full = new ArrayList<Barang>();
-	private List<String> list_data_supplier = new ArrayList<String>();
+	private List<Supplier> list_supplier = new ArrayList<Supplier>();
+	private List<Brand> list_brand = new ArrayList<Brand>();
 	
-	public List<String> getList_data_supplier() {
-		return list_data_supplier;
-	}
-
-	public void setList_data_supplier(String list_data_supplier) {
-		this.list_data_supplier.add(list_data_supplier);
-	}
-
+	
 	/* From androidhive.com -start- */
 	@Override
 	public void onCreate() {
@@ -102,6 +98,24 @@ public class AppsController extends Application {
 	public Context getMainContext() {
 		return this.mainContext;
 	}
+
+	public List<Supplier> getList_supplier() {
+		return list_supplier;
+	}
+
+	public void setList_supplier(Supplier list_supplier_full) {
+		this.list_supplier.add(list_supplier_full);
+	}
+
+	public List<Brand> getList_brand() {
+		return list_brand;
+	}
+
+	public void setList_brand(Brand list_brand_full) {
+		this.list_brand.add(list_brand_full);
+	}
+	
+	
 	// me -end- //
 
 }

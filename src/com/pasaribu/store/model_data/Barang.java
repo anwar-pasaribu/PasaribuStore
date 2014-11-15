@@ -18,8 +18,9 @@ public class Barang {
 	private int 	favorite;
 	
 	
-	//FIELD DATABASE
+	//FIELD DATABASE UTK TABLE BARANG
 	public static String ID_BARANG = "id_barang";
+	public static String ID_USER = "id_user";
 	public static String ID_MEREK = "id_merek";
 	public static String ID_PENJUAL = "id_penjual";
 	public static String ID_GAMBAR = "id_gambar";
