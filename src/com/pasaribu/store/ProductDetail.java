@@ -24,10 +24,9 @@ public class ProductDetail extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_product_detail);
 		
+		//Edited by anwar-va (Tester)
 		int id_barang = getIntent().getExtras().getInt(Barang.ID_BARANG);
-		
 		title_add_data_barang = (TextView) findViewById(R.id.title_add_data_barang);
-		
 		title_add_data_barang.setText("ID Barang Aktif : " + id_barang);
 		
 	}
