@@ -1,0 +1,166 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_scroll_add_data_barang"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+     >
+
+    <LinearLayout
+        android:id="@+id/LinearLayout_utama_add_data_barang"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="com.pasaribu.store.ProductDetail" >
+
+        <TextView
+            android:id="@+id/title_add_data_barang"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_8dp"
+            android:text="@string/title_add_data_barang"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/lbl_product_name"
+            style="@style/lable_margin_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lable_product_name" />
+
+        <TextView
+            android:id="@+id/TextView_product_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/hint_product_name"
+            android:inputType="text"
+            android:text="Nama Barang"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+             >
+
+            <requestFocus />
+        </TextView>
+
+        <TextView
+            android:id="@+id/lbl_product_brand"
+            style="@style/lable_margin_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lable_product_brand" />
+
+        <TextView
+            android:id="@+id/TextView_product_brand"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/hint_product_brand"
+            android:inputType="textAutoComplete"
+            android:text="Merek Barang" />
+
+        <TextView
+            android:id="@+id/lbl_product_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_8dp"
+            android:layout_marginTop="@dimen/margin_top_lbl"
+            android:text="@string/lable_product_price" />
+
+        <TextView
+            android:id="@+id/TextView_product_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/hint_product_price"
+            android:inputType="number"
+            android:text="Harga Barang" />
+
+        <LinearLayout
+            android:id="@+id/layout_product_amount_lable"
+            style="@style/lable_margin_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/lbl_product_stock"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:text="@string/lable_product_stock" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_product_amount_editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/TextView_product_num_unit"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:ems="10"
+                android:hint="@string/hint_product_stock"
+                android:inputType="number"
+                android:text="Jumlah Barang - Satuan" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lbl_product_category"
+            style="@style/lable_margin_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lable_product_category" />
+
+        <TextView
+            android:id="@+id/TextView_product_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kategori Barang" />
+
+        <TextView
+            android:id="@+id/lbl_supplier"
+            style="@style/lable_margin_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lable_supplier" />
+
+        <LinearLayout
+            android:id="@+id/layout_supplier"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/TextView_product_supplier"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Penjual Barang" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lbl_product_description"
+            style="@style/lable_margin_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lable_product_description" />
+
+        <TextView
+            android:id="@+id/TextView_product_description"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:ems="10"
+            android:gravity="start|top"
+            android:hint="@string/hint_product_description"
+            android:inputType="textMultiLine"
+            android:text="Deskripsi Barang" />
+
+    </LinearLayout>
+
+</ScrollView>
