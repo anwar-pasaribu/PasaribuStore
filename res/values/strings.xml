@@ -35,5 +35,12 @@
     <string name="hint_supplier_contact">Nomor Telepon</string>
     <string name="btn_add">Tambah</string>
     <string name="btn_cancel">Batal</string>
+    <string name="option_overflow_edit">Edit</string>
+    <string name="option_overflow_delete">Delete</string>
+    <string name="title_activity_edit_data_barang">Edit Data Barang</string>
+    <string name="title_activity_setting">Pengaturan</string>
+    <string name="lbl_alamat_ip">Alamat IP</string>
+    <string name="hint_ipAddress">Alamat IP Server</string>
+    <string name="title_activity_product_detail">ProductDetail</string>
 
 </resources>
