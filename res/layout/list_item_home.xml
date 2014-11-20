@@ -4,7 +4,8 @@
     android:id="@+id/layout_item_home"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    tools:ignore="HardcodedText" >
+    tools:ignore="HardcodedText"
+     >
 
     <ImageView
         android:id="@+id/image_status_favorite"
@@ -84,6 +85,9 @@
         android:layout_marginTop="@dimen/margin_8dp"
         android:background="@drawable/ic_overflow"
         android:contentDescription="@string/image_button_description"
-        android:src="@drawable/ic_overflow" />
+        android:src="@drawable/ic_overflow"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+         />
 
 </RelativeLayout>
