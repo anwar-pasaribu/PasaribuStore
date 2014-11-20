@@ -10,9 +10,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.color;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -25,6 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -102,7 +106,7 @@ public class AddDataBarang extends Activity
 		lbl_product_description = (TextView) findViewById(R.id.lbl_product_description);
 		
 		editText_product_name = (EditText) findViewById(R.id.editText_product_name);
-		autoComp_product_brand = (AutoCompleteTextView) findViewById(R.id.autoComp_product_brand);
+		autoComp_product_brand = (AutoCompleteTextView) findViewById(R.id.TextView_product_brand);
 		editText_product_price = (EditText) findViewById(R.id.editText_product_price);
 		editText_product_stock = (EditText) findViewById(R.id.editText_product_stock);
 		autoComp_product_unit = (AutoCompleteTextView) findViewById(R.id.autoComp_product_unit);
@@ -118,7 +122,6 @@ public class AddDataBarang extends Activity
 		pDialog = new ProgressDialog(AddDataBarang.this);
 		pDialog.setMessage("Loading...");
 		pDialog.setCancelable(false);
-		
 		
 		
 		//dialodAddSupplier.setContentView(R.layout.add_data_supplier);
@@ -140,11 +143,6 @@ public class AddDataBarang extends Activity
 		//Diganti : data jadi diambil dari database MYsQL
 		//getSpinner data utk SEMENTARA mengambil data SUPPLIER dan BRAND
 		getSpinnerData();
-//		list_data_supplier.add("Hikmah Jaya");
-//		list_data_supplier.add("Bintang Motor");
-//		list_data_supplier.add("Sumatera Diesel");
-//		list_data_supplier.add("Sumatera Tehnik");
-//		list_data_supplier.add("Zaman Baru");
 		
 		list_data_product_unit.add("Kotak");
 		list_data_product_unit.add("Lusin");
@@ -152,15 +150,7 @@ public class AddDataBarang extends Activity
 		list_data_product_unit.add("Kaleng");
 		list_data_product_unit.add("Botol");
 		list_data_product_unit.add("Buah");
-		list_data_product_unit.add("Plastik");
-		
-//		list_data_brand.add("Samsung");
-//		list_data_brand.add("LG");
-//		list_data_brand.add("Hannocs");
-//		list_data_brand.add("Hitachi");
-//		list_data_brand.add("Aspira");
-//		list_data_brand.add("Dunlop");
-		
+		list_data_product_unit.add("Plastik");		
 		
 		spinner_product_category.setAdapter(generateSpinnerAdapter(list_data_category));
 		//spinner_supplier.setAdapter(generateSpinnerAdapter(list_data_supplier));
@@ -186,6 +176,70 @@ public class AddDataBarang extends Activity
 		
 	}
 
+	private void getFormDataAndSend() {
+		// TODO Memperoleh seluruh data dari form		
+		
+		String product_name 	= editText_product_name.getText().toString();		
+		String product_brand 	= autoComp_product_brand.getText().toString(); //TODO Kejanggalan utk database
+		String product_price 	= editText_product_price.getText().toString();
+		String product_stock 	= editText_product_stock.getText().toString();
+		String product_unit 	= autoComp_product_unit.getText().toString();
+		String product_category = spinner_product_category.getSelectedItem().toString();
+		String product_supplier = spinner_supplier.getSelectedItem().toString();
+		String product_description = editText_product_description.getText().toString();
+		
+		//get product_brand id from nama_merek(product_brand), to send to mysql database
+		//Jika merek tidak didapatkan, maka String (teks) merek yang akan di kirim
+		//Untuk selanjutnya di proses oleh server
+		int brand_list_size = aController.getList_brand().size();
+		for(int i = 0; i < brand_list_size; i++) {
+			if(aController.getList_brand().get(i).getNama_merek().equals(product_brand)) {
+				product_brand = aController.getList_brand().get(i).getId_merek() + "";
+			}
+		}
+		
+		//get supplier_id from product_supplier text
+		//Jika tidak di dapat maka teks akan di kirim ke server utk di proses
+		int supplier_list_size = aController.getList_supplier().size();
+		for(int i = 0; i < supplier_list_size; i++) {
+			if(aController.getList_supplier().get(i).getNama_toko().equals(product_supplier)) {
+				product_supplier = aController.getList_supplier().get(i).getId_penjual() + "";
+			}
+		}
+		
+		//Membuat string tanggal sekarang
+		Calendar now = Calendar.getInstance();
+		int month = now.get(Calendar.MONTH) + 1;
+		int day = now.get(Calendar.DAY_OF_MONTH);
+		int year = now.get(Calendar.YEAR);
+		
+		String tanggal_mysql = year+"-"+month+"-"+day;
+		
+		
+		Map<String, String> data_barang_to_send = new HashMap<String, String>();
+		//Data utk id_barang AUTOINCREMENT di server
+		data_barang_to_send.put(Barang.ID_USER, "1"); //TODO Guna - User Aktif diasumsikan!
+		data_barang_to_send.put(Barang.ID_MEREK, product_brand);
+		data_barang_to_send.put(Barang.ID_PENJUAL, product_supplier);
+		data_barang_to_send.put(Barang.ID_GAMBAR, "0"); //TODO Ingat, utk sekarang gambar masih kosong
+		data_barang_to_send.put(Barang.NAMA_BARANG, product_name);
+		data_barang_to_send.put(Barang.STOK_BARANG, product_stock + "");
+		data_barang_to_send.put(Barang.SATUAN_BARANG, product_unit);
+		data_barang_to_send.put(Barang.HARGA_BARANG, product_price);
+		data_barang_to_send.put(Barang.TGL_HARGA_STOK_BARANG, tanggal_mysql);
+		data_barang_to_send.put(Barang.KODE_BARANG, "KODE");
+		data_barang_to_send.put(Barang.LOKASI_BARANG, "LOKASI");
+		data_barang_to_send.put(Barang.KATEGORI_BARANG, product_category);
+		data_barang_to_send.put(Barang.DESKRIPSI_BARANG, product_description);
+		data_barang_to_send.put(Barang.FAVORITE, "0"); //Default status favorite utk Barang Adalah 0
+		
+		Log.i(TAG, "Data yang akan di kirim : " + data_barang_to_send.toString());
+		
+		//Mengirim data ke server utk di olah
+		JSONObjectAccess(AppsConstanta.URL_INSERT_PRODUCT, data_barang_to_send);		
+		
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.add_data_barang, menu);
@@ -200,8 +254,25 @@ public class AddDataBarang extends Activity
 		switch (id) {
 		case R.id.option_done_adding:
 			
-			//TODO aksi menyimpan data ke SQLite, ke MySQL jika online			
-			getFormDataAndSend();
+			// Aksi menyimpan data ke SQLite, ke MySQL jika online.
+			// Pertama periksa dulu formulir
+			if( validateAddProductForm() ) {
+				
+				if(aController.isNetworkAvailable()) {
+					
+					getFormDataAndSend(); 
+					
+				} else {
+					//TODO Remind - Lakukan penyimpanan ke SQLite. Utk sekarang masih fokus MySQL
+					showAlertDialog("Tidak Ada Jaringan", "\nData akan di simpan ke penyimpanan lokal");
+				}
+				
+
+			} else {
+				Toast.makeText(getApplicationContext(), 
+						"Form Masih Kosong, Periksa kembali formulir, pastikan sudah di isi.", 
+						Toast.LENGTH_SHORT).show();
+			}
 			
 			break;
 			
@@ -220,71 +291,12 @@ public class AddDataBarang extends Activity
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void getFormDataAndSend() {
-		// TODO Memperoleh seluruh data dari form
-		
-		String product_name = editText_product_name.getText().toString();		
-		int product_brand_id = 0;
-		String product_brand = autoComp_product_brand.getText().toString(); //TODO Kejanggalan utk database
-		String product_price = editText_product_price.getText().toString();
-		String product_stock = editText_product_stock.getText().toString();
-		String product_unit = autoComp_product_unit.getText().toString();
-		String product_category = spinner_product_category.getSelectedItem().toString();
-		String product_supplier = spinner_supplier.getSelectedItem().toString();
-		int product_supplier_id = 0;
-		String product_description = editText_product_description.getText().toString();
-		
-		//get product_brand id from nama_merek(product_brand), to send to mysql database
-		int brand_list_size = aController.getList_brand().size();
-		for(int i = 0; i < brand_list_size; i++) {
-			if(aController.getList_brand().get(i).getNama_merek().equals(product_brand)) {
-				product_brand_id = aController.getList_brand().get(i).getId_merek();
-			}
-		}
-		
-		//get product_supplier_id from product_supplier text
-		int supplier_list_size = aController.getList_supplier().size();
-		for(int i = 0; i < supplier_list_size; i++) {
-			if(aController.getList_supplier().get(i).getNama_toko().equals(product_supplier)) {
-				product_supplier_id = aController.getList_supplier().get(i).getId_penjual();
-			}
-		}
-		
-		//Membuat string tanggal sekarang
-		Calendar now = Calendar.getInstance();
-		int month = now.get(Calendar.MONTH) + 1;
-		int day = now.get(Calendar.DAY_OF_MONTH);
-		int year = now.get(Calendar.YEAR);
-		
-		
-		Map<String, String> data_barang_to_send = new HashMap<String, String>();
-		//Data utk id_barang AUTOINCREMENT di server
-		data_barang_to_send.put(Barang.ID_USER, "1"); //TODO Guna - User Aktif diasumsikan!
-		data_barang_to_send.put(Barang.ID_MEREK, product_brand_id + ""); //Karena Map<String, String>
-		data_barang_to_send.put(Barang.ID_PENJUAL, product_supplier_id + "");
-		data_barang_to_send.put(Barang.ID_GAMBAR, "0"); //TODO Ingat, utk sekarang gambar masih kosong
-		data_barang_to_send.put(Barang.NAMA_BARANG, product_name);
-		data_barang_to_send.put(Barang.STOK_BARANG, product_stock + "");
-		data_barang_to_send.put(Barang.SATUAN_BARANG, product_unit);
-		data_barang_to_send.put(Barang.HARGA_BARANG, product_price);
-		data_barang_to_send.put(Barang.TGL_HARGA_STOK_BARANG, year+"-"+month+"-"+day);
-		data_barang_to_send.put(Barang.KODE_BARANG, "");
-		data_barang_to_send.put(Barang.LOKASI_BARANG, "");
-		data_barang_to_send.put(Barang.KATEGORI_BARANG, product_category);
-		data_barang_to_send.put(Barang.DESKRIPSI_BARANG, product_description);
-		
-		JSONObjectAccess(AppsConstanta.URL_INSERT_PRODUCT, data_barang_to_send);
-		
-		Toast.makeText(this, "Data Berhasil ditambahkan", Toast.LENGTH_LONG).show();
-		
-	}
-
 	//Menangani Seleksi pada spinner
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int position,
 			long id) {
 		
-		editText_product_description.setText("");
+//		editText_product_description.setText("");
 		
 		int id_spinner = parent.getId();
 	
@@ -296,11 +308,11 @@ public class AddDataBarang extends Activity
 			kategori = parent.getItemAtPosition(position).toString();
 			break;
 		default:
-			editText_product_description.setText("Tidak tahu spinner aktif " + view.toString());
+//			editText_product_description.setText("Tidak tahu spinner aktif " + view.toString());
 			break;
 		}
 		
-		editText_product_description.setText("Spinner Supplier : " + supplier + " \nKategori : " + kategori);
+//		editText_product_description.setText("Spinner Supplier : " + supplier + " \nKategori : " + kategori);
 
 		
 	}
@@ -339,8 +351,6 @@ public class AddDataBarang extends Activity
 		// Data yg diperoleh adalah 
 		
 		String str_nama_toko = new_supplier_data.get(AppsConstanta.KEY_NAMA_TOKO).toString();
-		String str_alamat_toko = new_supplier_data.get(AppsConstanta.KEY_ALAMAT_TOKO).toString();
-		String str_kontak_toko = new_supplier_data.get(AppsConstanta.KEY_KONTAK_TOKO).toString();
 		
 		if(!str_nama_toko.equals("") && !list_data_supplier.contains(str_nama_toko)) {
 			
@@ -361,19 +371,19 @@ public class AddDataBarang extends Activity
 
 	@Override
 	public void onDialogNegativeClick(DialogFragment dialog) {
-		// TODO Menangani negative action saat membuka dialog add supplier
-		
-		Toast.makeText(AddDataBarang.this, "Negatif : " + dialog.toString(), Toast.LENGTH_LONG).show();
+		// Menangani negative action saat membuka dialog add supplier
+		return;
 	}
 	
 	//TODO Utk akses data di server MySQL
 	private void JSONObjectAccess(String URL, Map<String, String> data_to_send) {			
+		
 		showProgressDialog();		
 		
+		Log.i(TAG, "JSONObjectAccess, URL : " + URL );
 		
-		//Log.i(TAG, "Data Request : " + data_to_send.toString());
 		
-		CustonJsonObjectRequest jsonObjReq = new CustonJsonObjectRequest(
+		CustonJsonObjectRequest addDataBarangjsonObjReq = new CustonJsonObjectRequest(
 				Method.POST,
 				URL, 
 				data_to_send, 
@@ -381,20 +391,24 @@ public class AddDataBarang extends Activity
 	
 					@Override
 					public void onResponse(JSONObject response) {
+					
+					Log.i(TAG, "Response JSONObject : " + response.toString());	
 						
-					//TODO Olah respon data dari server berdasarkan URL yang dimasukkan
-						
-					//Kasus renspon data supplier/barang(product) sudah berhasil di tambah, dengan memeriksa header json
-					//Apakah sudah terdapat header last_id nya kemudia periksa apakah tidak 0
-					//Karena kondisi 0, berarti data tidak berhasil di masukkan atau tidak ada perintah insert
-					if(!response.isNull(AppsConstanta.JSON_HEADER_LAST_INSERTED_ID) ) {
+					// Olah respon data dari server berdasarkan URL yang dimasukkan	
+					// Memeriksa header "msg" dari server, apakah gagal atau berhasil
+					if(!response.isNull(AppsConstanta.JSON_HEADER_MESSAGE) ) {
 
 						try {
 							
-							int last_inserted_id = response.getInt(AppsConstanta.JSON_HEADER_LAST_INSERTED_ID);
+							String message = response.getString(AppsConstanta.JSON_HEADER_MESSAGE);
 							
-							if(last_inserted_id != 0) {
-								//TODO Lakukan jika berhasil input data ke MySQL database
+							if(message.equals(AppsConstanta.MESSAGE_SUCCESS)) {
+								//Lakukan jika berhasil input data ke MySQL database
+								showAlertDialog_formClearing("Data Berhasil Ditambah", "Data berhasil di tambah ke penyimpanan pusat.\nKosongkan formulir?");
+								
+							} else {
+								//Lakukan jika gagal input data ke MySQL database
+								showAlertDialog("Tambah Data Gagal", "Proses penambahan data barang gagal. Periksa kembali form, pastikan sudah di isi dengan baik");
 							}
 							
 						} catch (JSONException e) {
@@ -404,7 +418,7 @@ public class AddDataBarang extends Activity
 					} else if(!response.isNull(AppsConstanta.JSON_HEADER_SUPPLIER) && !response.isNull(AppsConstanta.JSON_HEADER_BRAND)) {
 						//TODO Jika response data berisi header SUPPLIER dan BRAND, maka proses utk dimasukkan ke Spinner
 						parseJSONData(response);
-					}
+					} 
 						
 						
 					hideProgressDialog();
@@ -414,16 +428,19 @@ public class AddDataBarang extends Activity
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						
-						VolleyLog.d(TAG, "Error: " + error.toString());
-						Log.e(TAG, "ErrorResponse : " + error.toString());
-						hideProgressDialog();
+						VolleyLog.e(TAG, "Error: " + error.toString());
+						Log.e(TAG, "Error Listener, getLocalizedMessage : " + error.getLocalizedMessage());
+						Log.e(TAG, "Error Listener, getMessage : " + error.getMessage());
+						Log.e(TAG, "Error Listener, getStackTrace : " + error.getStackTrace().toString());
+						error.printStackTrace();
 						
+						hideProgressDialog();
 						
 					}
 				}){};
 	
 		// Adding request to request queue
-		AppsController.getInstance().addToRequestQueue(jsonObjReq, tag_add_data_barang);		
+		AppsController.getInstance().addToRequestQueue(addDataBarangjsonObjReq, tag_add_data_barang);		
 		
 		} 
 	
@@ -497,6 +514,165 @@ public class AddDataBarang extends Activity
 				pDialog.hide();
 		}
 
-	
+		
+		//Alert jika input data barang tidak berhasil
+		private void showAlertDialog(String title, String message) {		
+			
+	    	new AlertDialog.Builder(AddDataBarang.this)
+	    	.setTitle(title)
+	    	.setMessage(message)
+	    	.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					//
+				}
+				
+			}).show();
+	    	
+	    }
+		
+		//Alert jika input data barang  berhasil di tambah ke server
+		//Tanya pengguna apakah form dibersihkan, atau dibiarkan saja (karena data n+1 mungkin mirip)
+		private void showAlertDialog_formClearing(String title, String message) {		
+			
+	    	new AlertDialog.Builder(AddDataBarang.this)
+	    	.setTitle(title)
+	    	.setMessage(message)
+	    	.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					clearAddProductForm();
+				}
+			})
+			.setNegativeButton("TIDAK", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					editText_product_name.setFocusableInTouchMode(true);
+					editText_product_name.requestFocus();
+					
+				}
+			})
+			.show();
+	    	
+	    }
+		
+		
+		//TODO Fungsi untuk menghilangkan text pada EditText, AutoCompleteTextView
+		private void clearAddProductForm() {
+			
+			LinearLayout linearLayout_utama_add_data_barang = (LinearLayout) findViewById(R.id.LinearLayout_utama_add_data_barang);
+			
+			ArrayList<EditText> list_editText = new ArrayList<EditText>();
+			ArrayList<AutoCompleteTextView> list_autoCompleteTextView = new ArrayList<AutoCompleteTextView>();
+			
+			for(int i = 0; i < linearLayout_utama_add_data_barang.getChildCount(); i++) {
+				
+				if(linearLayout_utama_add_data_barang.getChildAt(i) instanceof EditText) { 
+					list_editText.add( (EditText) linearLayout_utama_add_data_barang.getChildAt(i) );
+				}
+				else if ( linearLayout_utama_add_data_barang.getChildAt(i) instanceof AutoCompleteTextView ) {
+					list_autoCompleteTextView.add((AutoCompleteTextView) linearLayout_utama_add_data_barang.getChildAt(i) );
+				} else if ( linearLayout_utama_add_data_barang.getChildAt(i) instanceof LinearLayout ) {
+					
+					LinearLayout myLayout = (LinearLayout) linearLayout_utama_add_data_barang.getChildAt(i);
+					
+					for(int j = 0; j < myLayout.getChildCount(); j++) {
+						
+						if(myLayout.getChildAt(j) instanceof EditText) {
+							list_editText.add((EditText) myLayout.getChildAt(j) );
+						} else if (myLayout.getChildAt(j) instanceof AutoCompleteTextView) {
+							list_autoCompleteTextView.add((AutoCompleteTextView) myLayout.getChildAt(j));
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+			for(int i = 0 ; i < list_editText.size(); i++ ) {
+				list_editText.get(i).setText("");
+			}
+			
+			for(int i = 0 ; i < list_autoCompleteTextView.size(); i++ ) {
+				list_autoCompleteTextView.get(i).setText("");
+			}
+			
+			spinner_product_category.setSelection(0);
+			spinner_supplier.setSelection(0);
+			
+		}
+		
+		//TODO Fungsi untuk validasi form add barang
+		private boolean validateAddProductForm() {
+			
+			LinearLayout linearLayout_utama_add_data_barang = (LinearLayout) findViewById(R.id.LinearLayout_utama_add_data_barang);
+			
+			ArrayList<EditText> list_editText = new ArrayList<EditText>();
+			ArrayList<AutoCompleteTextView> list_autoCompleteTextView = new ArrayList<AutoCompleteTextView>();
+			
+			//Mengambil view dari form
+			for(int i = 0; i < linearLayout_utama_add_data_barang.getChildCount(); i++) {
+				
+				if(linearLayout_utama_add_data_barang.getChildAt(i) instanceof EditText) { 
+					list_editText.add( (EditText) linearLayout_utama_add_data_barang.getChildAt(i) );
+				}
+				else if ( linearLayout_utama_add_data_barang.getChildAt(i) instanceof AutoCompleteTextView ) {
+					list_autoCompleteTextView.add((AutoCompleteTextView) linearLayout_utama_add_data_barang.getChildAt(i) );
+				} else if ( linearLayout_utama_add_data_barang.getChildAt(i) instanceof LinearLayout ) {
+					
+					LinearLayout myLayout = (LinearLayout) linearLayout_utama_add_data_barang.getChildAt(i);
+					
+					for(int j = 0; j < myLayout.getChildCount(); j++) {
+						
+						if(myLayout.getChildAt(j) instanceof EditText) {
+							list_editText.add((EditText) myLayout.getChildAt(j) );
+						} else if (myLayout.getChildAt(j) instanceof AutoCompleteTextView) {
+							list_autoCompleteTextView.add((AutoCompleteTextView) myLayout.getChildAt(j));
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+			
+			//Validasi EditText, apakah kosong
+			for(int i = 0 ; i < list_editText.size(); i++ ) {
+				
+				if( list_editText.get(i).getText().toString().matches("") ) {
+					
+					list_editText.get(i).setFocusableInTouchMode(true);
+					list_editText.get(i).requestFocus();
+					
+					return false;
+					
+				} 
+				
+				
+			}
+			
+			//Validasi AutoComplete 
+			for(int i = 0 ; i < list_autoCompleteTextView.size(); i++ ) {
+				
+				if(list_autoCompleteTextView.get(i).getText().toString().matches("") ) {
+					
+					list_autoCompleteTextView.get(i).setFocusableInTouchMode(true);
+					list_autoCompleteTextView.get(i).requestFocus();					
+					
+					return false;
+					
+				} 
+				
+			}
+			
+			
+			return true;
+			
+		}
 	
 }
