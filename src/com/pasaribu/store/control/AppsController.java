@@ -5,6 +5,8 @@ import java.util.List;
 
 import android.app.Application;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -77,6 +79,14 @@ public class AppsController extends Application {
 	}	
 	/* from androidhive.com -end- */
 	
+	//Cek koneksi internet / jaringan
+	//Source : http://stackoverflow.com/questions/4238921/detect-whether-there-is-an-internet-connection-available-on-android
+	public boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
 	
 	// me -start- //
 	public Barang getBarangAtPosition(int position) {
@@ -93,6 +103,10 @@ public class AppsController extends Application {
 	
 	public int getBarangArrayListSize() {
 		return barang_data_full.size();
+	}
+	
+	public void clearAllBarangList() {
+		barang_data_full.clear();
 	}
 	
 	public Context getMainContext() {
