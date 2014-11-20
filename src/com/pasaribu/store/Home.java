@@ -12,14 +12,19 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
@@ -27,37 +32,21 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.pasaribu.store.control.AppsController;
 import com.pasaribu.store.control.CustonJsonObjectRequest;
-import com.pasaribu.store.control.GetCloudData;
 import com.pasaribu.store.model_data.AppsConstanta;
 import com.pasaribu.store.model_data.Barang;
-import com.pasaribu.store.model_data.ListRecentlyProduct;
 import com.pasaribu.store.view.CustomListHome;
-import com.pasaribu.store.view.DisplayGui;
+import com.pasaribu.store.view.CustomListHome.CustomListHomeListener;
 
-public class Home extends Fragment {
+public class Home extends Fragment implements CustomListHomeListener{
 	
 	// from androidhive.com -start- //
 	
 	protected static final String TAG = Home.class.getSimpleName();
 	private ProgressDialog pDialog;
 	
-	//URL_DATA pindah ke 
-	//private String URL_DATA 	= "http://192.168.56.5/pasaribu_store/function/getDataBarang.php"; //Hanya utk kebutuhan belajar
-	
-	//Var ini dipindahkan ke AppsConstanta.java
-		//private String JSON_HEADER_BARANG 	= "BARANG"; //jenis kepala json
-		//private String JSON_HEADER_DATA_SIZE = "DATA_BARANG_SIZE";
-	private String tag_json_obj = "jobj_data_home_req";
-	
-	private List<Barang> DataBarang_home = new ArrayList<Barang>();
-	private List<ListRecentlyProduct> DataBarang_recently = new ArrayList<ListRecentlyProduct>();
-	
-	private ListView list_home, list_recently;
-	
-	private GetCloudData getCloudData;
-	private CustomListHome customListHome;
-	private DisplayGui displayGui;
-	
+	private String tag_json_obj = "jobj_data_home_req";		
+	private ListView list_home, list_recently;	
+	private CustomListHome customListHome;	
 	private AppsController aController;
 	
 
@@ -74,15 +63,30 @@ public class Home extends Fragment {
 		
 		
 		aController = (AppsController) getActivity().getApplicationContext();
-		displayGui = new DisplayGui(aController.getMainContext());
 		
-		getCloudData = new GetCloudData(); //Kelas utk memperoleh data utk ditampilkan di Home
 		
-		list_home = (ListView) android.findViewById(R.id.list_home);
+		list_home = (ListView) android.findViewById(R.id.list_home);		
+		
 		list_recently = (ListView) android.findViewById(R.id.list_recently);
+		list_recently.setItemsCanFocus(false);
+		list_recently.setFocusable(false);
+		list_recently.setFocusableInTouchMode(false);
+		list_recently.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Toast.makeText(getActivity(), "List Recently", Toast.LENGTH_SHORT).show();
+				
+			}
+		});
+		//Utk list recently
+		populateRecentlyList();
 		
+		//Utk list home
 		requestAllDataBarangJSONObject();
-	    
+		
+		
 		Log.d(TAG, "Setelah Panggilan populateListDataBarang() ");
 		
 		return android;
@@ -111,7 +115,7 @@ public class Home extends Fragment {
 						if(response.isNull(AppsConstanta.JSON_HEADER_BARANG) && response.isNull(AppsConstanta.JSON_HEADER_DATA_SIZE) ) {
 							try {
 								
-								String msg = response.getString("msg");
+								String msg = response.getString(AppsConstanta.JSON_HEADER_MESSAGE);
 								showAlertDialog("Network Database Error ", msg + ", but can't access network database.\nPlease check network connectivity, or please try again");
 
 							} catch (JSONException e) {
@@ -120,7 +124,6 @@ public class Home extends Fragment {
 							}
 						} else {						
 							parseJSONObject(response);
-							populateListDataBarang();
 						}
 						
 						hideProgressDialog();
@@ -142,16 +145,95 @@ public class Home extends Fragment {
 		//from androidhive.com -end- //
 	
 	
+	public void parseJSONObject(JSONObject responseJsonObject) {
+		
+		//TODO Olah JSONObject data, jika pemanggilan Volley normal
+    	try {
+    		
+    		JSONObject jsonResponse 		= new JSONObject(responseJsonObject.toString());    		
+    		int data_barang_size_new 		= jsonResponse.getInt(AppsConstanta.JSON_HEADER_DATA_SIZE);
+    		JSONArray jArray_dataBarang 	= jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BARANG);    		
+    		int jArray_dataBarang_length 	= jArray_dataBarang.length();
+    		int data_barang_size_local 		= aController.getBarangArrayListSize();
+    		
+    		//Memeriksa apakah ukuran data barang di aController sama dengan data yang baru masuk
+    		// Jika sama, data pada list di home akan tetap, jika tidak
+    		// Akan di olah lebih lanjut     		
+    		if(data_barang_size_new != data_barang_size_local ) {
+    			
+    			if(data_barang_size_new > data_barang_size_local) {				
+    						
+						for (int i = data_barang_size_local; i < jArray_dataBarang_length; i++ ) {							
+							JSONObject jsonObject = jArray_dataBarang.getJSONObject(i);
+							aController.setBarang(createBarangFromJSONObject(jsonObject));					
+						}
+    				
+    			} else if( data_barang_size_new < data_barang_size_local ) {
+    				
+    				aController.clearAllBarangList();
+    				
+    				for (int i = 0; i < jArray_dataBarang_length; i++ ) {							
+						JSONObject jsonObject = jArray_dataBarang.getJSONObject(i);
+						aController.setBarang(createBarangFromJSONObject(jsonObject));					
+					}
+    				
+    			}  			    			
+			
+    		} else {
+    			populateListDataBarang();
+    		}
+
+			Log.i(TAG, "Ukuran Data : " + data_barang_size_new);
+			
+			
+		} catch (Exception e) {
+			Log.e(TAG, "Gagal : Tidak dapat mengambil data JSON saat parseJSONObject. Message : " + e.getMessage());
+		} finally {
+			
+			populateListDataBarang();
+			
+		}  	
+    	
+    	
+	}	
+	
+	
 	public void populateListDataBarang()  {	
 		
-		//TODO input data ke AppsController utk bisa di akses pada Activity lain
-		int data_size = DataBarang_home.size();
-		for(int i = 0; i < data_size; i++) {
-			aController.setBarang(DataBarang_home.get(i));
-		}
+		int data_size = aController.getBarangArrayListSize();		
 		
-		if(data_size <= 0) {			
-	
+		if (data_size > 0) {
+			
+			list_home.setAdapter(null);
+			
+			//Set Adapter utk list_home. List barang diperoleh dari aController.
+			customListHome = new CustomListHome(getActivity(), aController.getAllBarangList());
+			customListHome.setCallBack(this);
+			list_home.setItemsCanFocus(false);
+			list_home.setFocusable(false);
+			list_home.setFocusableInTouchMode(false);
+			list_home.setAdapter(customListHome);
+			
+			list_home.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view,
+						int position, long id) {
+					
+					Barang selected_data_barang = (Barang) aController.getBarangAtPosition(position);
+					int id_barang = selected_data_barang.getId_barang();
+					
+					//TODO Membuka activity baru (ProductDetails) dengan mengirim 
+					//variable id_barang aktif melalui metode putExtra().
+					Intent intent_product_detail = new Intent(getActivity(), ProductDetail.class);
+					intent_product_detail.putExtra(Barang.ID_BARANG, id_barang);
+					startActivity(intent_product_detail);
+					
+				}
+			});
+			
+		} else  {		
+			//Jika tidak ada data hasil parsing JSONObject
 			List<String> data_list_recently = new ArrayList<String>();
 		    data_list_recently.add("No Data Found!");
 		    
@@ -160,64 +242,14 @@ public class Home extends Fragment {
 		    		android.R.layout.simple_list_item_1,
 		    		data_list_recently
 		    		);
+		    
 		    list_home.setAdapter(newAdapter);
 		    
-		} else {
-			list_home.setAdapter(null);
-			//TODO Set Adapter utk list_home. List barang diperoleh dari aController.
-			customListHome = new CustomListHome(getActivity(), aController.getAllBarangList());
-			list_home.setAdapter(customListHome);
-		}
+		} 
 		
 	}
 
-	public void parseJSONObject(JSONObject responseJsonObject) {
-		
-		//TODO Olah JSONObject data, jika pemanggilan Volley normal
-    	try {
-    		
-    		JSONObject jsonResponse = new JSONObject(responseJsonObject.toString());    		
-    		int data_barang_size = jsonResponse.getInt(AppsConstanta.JSON_HEADER_DATA_SIZE);
-    		JSONArray jArray_DataBarang = jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BARANG);
-    		
-			//TODO: Untuk mengambil data dari JSONArray
-    		int jArrayLength = jArray_DataBarang.length();
-			for (int i = 0; i < jArrayLength; i++ ) {
-				
-				JSONObject jsonObject = jArray_DataBarang.getJSONObject(i);
-				
-				//Menyimpan data ke Data Structure dataBarang (ke dalam List<Barang>)
-				DataBarang_home.add(new Barang(
-						jsonObject.getInt(Barang.ID_BARANG), 
-						jsonObject.getInt(Barang.ID_MEREK), 
-						jsonObject.getInt(Barang.ID_PENJUAL), 
-						jsonObject.getInt(Barang.ID_GAMBAR), 
-						jsonObject.getString(Barang.NAMA_BARANG), 
-						jsonObject.getInt(Barang.STOK_BARANG), 
-						jsonObject.getString(Barang.SATUAN_BARANG), 
-						jsonObject.getInt(Barang.HARGA_BARANG), 
-						jsonObject.getString(Barang.TGL_HARGA_STOK_BARANG), 
-						jsonObject.getString(Barang.KODE_BARANG), 
-						jsonObject.getString(Barang.LOKASI_BARANG), 
-						jsonObject.getString(Barang.KATEGORI_BARANG), 
-						jsonObject.getString(Barang.DESKRIPSI_BARANG), 
-						jsonObject.getInt(Barang.FAVORITE) 
-						));								
-								
-			}
-
-			Log.i(TAG, "JSON Response : " + jsonResponse.toString());
-			Log.i(TAG, "Data Barang Size : " + data_barang_size);
-			Log.i(TAG, "Data Barang Array : " + jArray_DataBarang.toString());
-			
-			
-		} catch (Exception e) {
-			Log.e(TAG, "Gagal : Tidak dapat mengambil data JSON saat parseJSONObject. Message : " + e.getMessage());
-		}
-	}
-	
-	
-	 public void showAlertDialog(String title, String message) {		
+	public void showAlertDialog(String title, String message) {		
 		
 		new AlertDialog.Builder(getActivity())
 		.setTitle(title)
@@ -226,10 +258,74 @@ public class Home extends Fragment {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				//TODO Lakukan pengambilan database offline (SQLite)
+				return;
 			}
 		}).show();
 		
+	}
+
+	private Barang createBarangFromJSONObject(JSONObject jsonObject) {
+		
+		Barang data_barang_temp = null;
+		try {
+			data_barang_temp = new Barang(
+					jsonObject.getInt(Barang.ID_BARANG), 
+					jsonObject.getInt(Barang.ID_MEREK), 
+					jsonObject.getInt(Barang.ID_PENJUAL), 
+					jsonObject.getInt(Barang.ID_GAMBAR), 
+					jsonObject.getString(Barang.NAMA_BARANG), 
+					jsonObject.getInt(Barang.STOK_BARANG), 
+					jsonObject.getString(Barang.SATUAN_BARANG), 
+					jsonObject.getInt(Barang.HARGA_BARANG), 
+					jsonObject.getString(Barang.TGL_HARGA_STOK_BARANG), 
+					jsonObject.getString(Barang.KODE_BARANG), 
+					jsonObject.getString(Barang.LOKASI_BARANG), 
+					jsonObject.getString(Barang.KATEGORI_BARANG), 
+					jsonObject.getString(Barang.DESKRIPSI_BARANG), 
+					jsonObject.getInt(Barang.FAVORITE) 
+					);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}	
+		
+		return data_barang_temp;
+		
+	}
+
+	@Override
+	public void deleteDataBarangSuccess(boolean status) {
+		// TODO Lakukan jika proses hapus data berhasil
+		if(status) {
+			requestAllDataBarangJSONObject();
+			showAlertDialog("Data Berhasil Dihapus", "Data sudah dihapus dari database MySQL.");
+		}
+		
+	}
+	
+	private void populateRecentlyList() {		
+		
+		List<String> data_list_recently = new ArrayList<String>();
+	    data_list_recently.add("Daftar IP");
+	    data_list_recently.add(getHostName(null));
+	    
+	    ArrayAdapter<String> newAdapter = new ArrayAdapter<String> (
+	    		getActivity(), 
+	    		android.R.layout.simple_list_item_1,
+	    		data_list_recently
+	    		);
+	    
+	    list_recently.setAdapter(newAdapter);
+	    
+	}
+	
+	public static String getHostName(String defValue) {
+		try {
+			java.lang.reflect.Method getString = Build.class.getDeclaredMethod("getString", String.class);
+			getString.setAccessible(true);
+			return getString.invoke(null, "net.hostname").toString();
+		} catch (Exception e) {
+			return defValue;
+		}
 	}
 
 	private void showProgressDialog() {
