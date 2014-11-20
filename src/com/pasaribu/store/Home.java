@@ -83,7 +83,7 @@ public class Home extends Fragment implements CustomListHomeListener{
 		//Utk list recently
 		populateRecentlyList();
 		
-		//Utk list home
+		//Mengambil data list_home dari MySQL Database (Online)
 		requestAllDataBarangJSONObject();
 		
 		
