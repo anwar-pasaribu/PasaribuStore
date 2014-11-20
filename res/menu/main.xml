@@ -12,7 +12,7 @@
     
     <item
         android:id="@+id/option_add_barang"
-        android:showAsAction="never"
+        android:showAsAction="always"
         android:title="@string/option_add_barang"
         android:icon="@android:drawable/btn_plus"
         >
