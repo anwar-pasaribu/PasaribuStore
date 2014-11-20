@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.pasaribu.store.view.DisplayGui;
 
 public class Main extends FragmentActivity {
+	
+	protected static final String TAG = Main.class.getSimpleName();
 	
 	private ViewPager Tab;
     private TabPagerAdapter TabAdapter;
@@ -59,7 +62,7 @@ public class Main extends FragmentActivity {
 					FragmentTransaction ft) {
 				// TODO lakukan jika tab unselected
         		
-        		displayGui.displayToast(tab.getPosition() + " Position (UnSelected)");
+        		Log.i(TAG, tab.getPosition() + " Position (UnSelected)");
 				restoreIconAwal(tab);
 			}
         	
@@ -68,7 +71,7 @@ public class Main extends FragmentActivity {
 			public void onTabReselected(android.app.ActionBar.Tab tab,
 					FragmentTransaction ft) {
 				
-				displayGui.displayToast(tab.getPosition() + " Position (Reselected)");
+				Log.i(TAG, tab.getPosition() + " Position (Reselected)");
 				
 			}
 
@@ -77,7 +80,7 @@ public class Main extends FragmentActivity {
 	          
 	            Tab.setCurrentItem(tab.getPosition());
 	            
-	            displayGui.displayToast(tab.getPosition() + " Position (Selected)");
+	            Log.i(TAG, tab.getPosition() + " Position (Selected)");
 	            setTabIconAktif(tab);
 	            
 	        }
@@ -169,7 +172,9 @@ public class Main extends FragmentActivity {
 			break;
 		case R.id.option_setting:
 			
-			displayGui.showAlertDialog("Settings",	"Setting di pilih\nKarena belum ada isi\tMemeriksa format stringnya");
+			//TODO Membuka activity AddDataBarang tanpa data yang dikirimkan
+			Intent intent_setting = new Intent(getBaseContext(), Setting.class);
+			startActivity(intent_setting);
 
 			break;
 		default:
