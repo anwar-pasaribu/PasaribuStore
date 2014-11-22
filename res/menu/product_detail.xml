@@ -7,5 +7,12 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
+    
+    <item
+        android:icon="@android:drawable/star_off"
+        android:id="@+id/action_favoritize"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_favoritize"/>
 
 </menu>

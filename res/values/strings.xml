@@ -4,6 +4,7 @@
     <string name="app_name">Pasaribu Store</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="action_favoritize">Favorite</string>
     <string name="option_setting">Settings</string>
     <string name="option_search">Search</string>
     <string name="title_recently">Recently</string>

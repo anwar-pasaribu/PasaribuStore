@@ -61,7 +61,7 @@ public class Home extends Fragment implements CustomListHomeListener{
 		pDialog.setMessage("Loading...");
 		pDialog.setCancelable(false);
 		
-		
+		//Application Controller, berisi data ter-share utk semua activity.
 		aController = (AppsController) getActivity().getApplicationContext();
 		
 		
