@@ -501,6 +501,7 @@ public class AddDataBarang extends Activity
 			} catch (Exception e) {
 				Log.e(TAG, "Fail : Tidak dapat mengambil data JSON. Message : " + e.getMessage());
 			}
+	    	
 		}
 	
 
