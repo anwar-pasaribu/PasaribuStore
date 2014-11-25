@@ -39,7 +39,7 @@ public class AppsConstanta {
 	public static String LAST_INSERTED_ID = "last_inserted_id";
 	
 	//Informasi akses database mysql seperti URL_DATA. 
-	public static String URL_DATA 				= "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/getDataBarang.php"; 
+	public static String URL_DATA 				= "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/get_home_data.php"; 
 	public static String URL_INSERT_SUPPLIER 	= "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/insert_supplier.php"; 
 	public static String URL_INSERT_PRODUCT 	= "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/insert_product.php"; 
 	public static String URL_DELETE_PRODUCT 	= "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/delete_product.php"; 

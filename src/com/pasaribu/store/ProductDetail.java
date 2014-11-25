@@ -1,18 +1,23 @@
 package com.pasaribu.store;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.pasaribu.store.control.AppsController;
-import com.pasaribu.store.model_data.Barang;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.pasaribu.store.control.AppsController;
+import com.pasaribu.store.control.GetCloudData;
+import com.pasaribu.store.model_data.AppsConstanta;
+import com.pasaribu.store.model_data.Barang;
 
 /**
  * ProductDetail.java berguna untuk menampilkan data lengkap (semua informasi).
@@ -25,51 +30,139 @@ public class ProductDetail extends Activity {
 
 	private final String TAG = ProductDetail.class.getSimpleName();
 	
+	private GetCloudData getCloudData;
 	private AppsController aController;
+	private Barang active_productData;
 	
-	private TextView title_add_data_barang;
+	//TextView masing-masing data yang akan ditampilkan
+	private TextView 	TextView_product_name, TextView_product_brand, TextView_product_price,
+						TextView_product_num_unit, TextView_product_category, TextView_product_supplier,
+						TextView_product_description;
+
+	private int id_barang;
+	private int list_barang_index;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_product_detail);
 		
+		getCloudData = new GetCloudData();
 		aController = (AppsController) getApplicationContext();
 		
-		//Ambil ID Barang dari variable Itent
-		int id_barang = getIntent().getExtras().getInt(Barang.ID_BARANG);
-		title_add_data_barang = (TextView) findViewById(R.id.title_add_data_barang);
-		title_add_data_barang.setText("ID Barang Aktif : " + id_barang);
+		
+		//Inisialisasi semua TextView
+		initilizeTextView();
+		
+		id_barang 			= getIntent().getExtras().getInt(Barang.ID_BARANG);
+		list_barang_index 	= getIntent().getExtras().getInt("list_barang_index");		
+		
+		//Isi data barang ke TextView
+		populateTextViewData(id_barang, list_barang_index);
 		
 	}
 
-	//TODO Fungsi untuk mengisi textView secara otomatis.
-	private void getAllTextView() {
+	//Berfungsi utk mengisi data dari data barang baik di AppsController atau langsung dari cloud
+	private void populateTextViewData(int id_barang, int list_barang_index) {
 		
-		LinearLayout linearLayout_product_detail = (LinearLayout) findViewById(R.id.LinearLayout_utama_add_data_barang);
-		
-		ArrayList<EditText> list_editText = new ArrayList<EditText>();
-		
-		for(int i = 0; i < linearLayout_product_detail.getChildCount(); i++) {
+		//Periksa apakah ada koneksi jaringan, jika tidak ambil data di aController
+		if(aController.isNetworkAvailable()) {
+			//Ambil data dari MySQL Database
 			
-			if(linearLayout_product_detail.getChildAt(i) instanceof EditText) { 
-				list_editText.add( (EditText) linearLayout_product_detail.getChildAt(i) );
-			}			
+			//Data yang akan di kirim ke server
+			Map<String, String> dataToSend = new HashMap<String,String>();
+			dataToSend.put(Barang.ID_BARANG, ""+id_barang);
+			
+			/* Proses Get Cloud Data
+			* 1. Request Data sesuai URL dan data yg di inginkan.
+			* 2. Ambil JSONObject dan olah/parse sesuai kebutuhan.	
+			**/
+			getCloudData.requestJSONObject(AppsConstanta.URL_DATA, dataToSend, "get_product_detail");
+			parseJSONObject(getCloudData.getJsonObject());
+			
+		
+		} else {			
+			//Ambil data dari Application Controller
+			setTextViewContents();
 			
 		}
 		
-		for(int i = 0 ; i < list_editText.size(); i++ ) {
-			list_editText.get(i).setText("");
-		}				
-		
 		
 	}
+
+	/**
+	 * Mengisi TextView di Layout yang dibuat.
+	 */
+	private void setTextViewContents() {
+		//Ambil data barang pada pada index tertentu dari Application Controller
+		active_productData = aController.getBarangAtPosition(list_barang_index);
+		
+		TextView_product_name.setText(active_productData.getNama_barang());
+		TextView_product_brand.setText(active_productData.getId_merek() + " Brand");
+		TextView_product_price.setText("Rp " + active_productData.getHarga_barang());
+		TextView_product_num_unit.setText(active_productData.getStok_barang() + " " + active_productData.getSatuan_barang());
+		TextView_product_category.setText(active_productData.getKategori_barang());
+		TextView_product_supplier.setText(active_productData.getId_penjual() + " Supplier");
+		TextView_product_description.setText(active_productData.getDeskripsi_barang());
+	}
+
+	// Fungsi utk inisialisasi seluruh textView
+	private void initilizeTextView() {
+		
+		TextView_product_name = (TextView) findViewById(R.id.TextView_product_name);
+		TextView_product_brand = (TextView) findViewById(R.id.TextView_product_brand);
+		TextView_product_price = (TextView) findViewById(R.id.TextView_product_price);
+		TextView_product_num_unit = (TextView) findViewById(R.id.TextView_product_num_unit);
+		TextView_product_category = (TextView) findViewById(R.id.TextView_product_category);
+		TextView_product_supplier = (TextView) findViewById(R.id.TextView_product_supplier);
+		TextView_product_description = (TextView) findViewById(R.id.TextView_product_description);
+		
+	}
+
+	//Parser utk JSONOBject dari MySQL Database
+	private void parseJSONObject(JSONObject responseJsonObject) {
+		
+    	try {
+    		
+    		JSONObject jsonResponse 		= new JSONObject(responseJsonObject.toString());    		
+    		int data_barang_size_new 		= jsonResponse.getInt(AppsConstanta.JSON_HEADER_DATA_SIZE);
+    		JSONArray jArray_dataBarang 	= jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BARANG);    		
+    		int jArray_dataBarang_length 	= jArray_dataBarang.length();
+    		
+    		if(data_barang_size_new != 0 ) {
+    			
+				for (int i = 0; i < jArray_dataBarang_length; i++ ) {
+					
+					JSONObject jsonObject = jArray_dataBarang.getJSONObject(i);
+					
+					aController.setBarangAtPosition(list_barang_index, 
+													aController.createBarangFromJSONObject(jsonObject));					
+				}
+    				
+			
+    		} else {
+    			
+    			Toast.makeText(getApplicationContext(), "Barang dengan ID : " + id_barang + " tidak tersedia.", Toast.LENGTH_LONG).show();
+    			
+    		}
+			
+			
+		} catch (Exception e) {
+			Log.e(TAG, "Tidak dapat mengambil data JSON saat parseJSONObject. Message : " + e.getMessage());
+		} finally {
+			
+			setTextViewContents();
+			
+		}  	
+    	
+    	
+	}	
 	
 	
 	
-	
-	
-	//Action Bar -start- 
+	/////////////////////////////////////////////////////////////////////////
+	////////////////////////ACTION BAR - START///////////////////////////////
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -79,14 +172,12 @@ public class ProductDetail extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	//Action Bar -end- 
+	/////////////////////////////////////////////////////////////////////////
+	////////////////////////ACTION BAR - END/////////////////////////////////
 }

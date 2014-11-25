@@ -24,6 +24,8 @@ public class CustonJsonObjectRequest extends Request<JSONObject> {
 	
 	private Listener<JSONObject> listener;
 	private Map<String, String> params;
+	
+	private Priority low_priority = Priority.LOW;
 
 	public CustonJsonObjectRequest(
 			String url,
@@ -72,6 +74,15 @@ public class CustonJsonObjectRequest extends Request<JSONObject> {
 			return Response.error(new ParseError(je));
 		}
 	
+	}
+
+	@Override
+	public com.android.volley.Request.Priority getPriority() {
+		return low_priority;
+	}
+	
+	public void setPriority(Priority priority) {
+		this.low_priority = priority;
 	}
 
 	
