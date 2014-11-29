@@ -17,7 +17,7 @@
         tools:context="com.pasaribu.store.AddDataBarang" >
 
         <TextView
-            android:id="@+id/title_add_data_barang"
+            android:id="@+id/title_edit_data_barang"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_8dp"
