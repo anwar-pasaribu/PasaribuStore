@@ -26,6 +26,7 @@
     <string name="option_add_barang">Tambah Barang</string>
     <string name="image_button_description">Image Button</string>
     <string name="title_add_data_barang">Tambah Data Barang</string>
+    <string name="title_edit_data_barang">Ubah Data Barang</string>
     <string name="lable_product_stock">Jumlah Barang</string>
     <string name="hint_product_price">Harga</string>
     <string name="lable_supplier_name">Nama</string>
@@ -42,6 +43,6 @@
     <string name="title_activity_setting">Pengaturan</string>
     <string name="lbl_alamat_ip">Alamat IP</string>
     <string name="hint_ipAddress">Alamat IP Server</string>
-    <string name="title_activity_product_detail">ProductDetail</string>
+    <string name="title_activity_product_detail">Product Detail</string>
 
 </resources>
