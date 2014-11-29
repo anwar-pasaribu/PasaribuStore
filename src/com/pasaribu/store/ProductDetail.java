@@ -98,12 +98,15 @@ public class ProductDetail extends Activity {
 		//Ambil data barang pada pada index tertentu dari Application Controller
 		active_productData = aController.getBarangAtPosition(list_barang_index);
 		
+		String product_brand = aController.getBrandName(active_productData.getId_merek());
+		String store_name = aController.getSupplierNameById(active_productData.getId_penjual());
+		
 		TextView_product_name.setText(active_productData.getNama_barang());
-		TextView_product_brand.setText(active_productData.getId_merek() + " Brand");
+		TextView_product_brand.setText( product_brand );
 		TextView_product_price.setText("Rp " + active_productData.getHarga_barang());
 		TextView_product_num_unit.setText(active_productData.getStok_barang() + " " + active_productData.getSatuan_barang());
 		TextView_product_category.setText(active_productData.getKategori_barang());
-		TextView_product_supplier.setText(active_productData.getId_penjual() + " Supplier");
+		TextView_product_supplier.setText(store_name);
 		TextView_product_description.setText(active_productData.getDeskripsi_barang());
 	}
 

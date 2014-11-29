@@ -21,6 +21,7 @@ public class AppsConstanta {
 	public static String JSON_HEADER_BARANG = "BARANG";
 	public static String JSON_HEADER_SUPPLIER = "SUPPLIER";
 	public static String JSON_HEADER_BRAND = "BRAND";
+	public static String JSON_HEADER_CATEGORY = "CATEGORY";
 	public static String JSON_HEADER_DATA_SIZE = "DATA_SIZE";
 	public static String JSON_HEADER_LAST_INSERTED_ID = "LAST_INSERTED_ID";
 	public static String JSON_HEADER_QUERY = "QUERY";

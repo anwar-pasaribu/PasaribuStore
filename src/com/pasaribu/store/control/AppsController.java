@@ -13,7 +13,6 @@ import android.net.NetworkInfo;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
-import com.android.volley.Request.Priority;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
@@ -38,6 +37,7 @@ public class AppsController extends Application {
 	private List<Barang> barang_data_full = new ArrayList<Barang>();
 	private List<Supplier> list_supplier = new ArrayList<Supplier>();
 	private List<Brand> list_brand = new ArrayList<Brand>();
+	private List<String> list_product_category = new ArrayList<String>();
 	
 	
 	/* From androidhive.com -start- */
@@ -121,6 +121,17 @@ public class AppsController extends Application {
 		return barang_data_full.get(position);
 	}
 	
+	public Barang getBrangById(int id_barang) {
+		
+		Barang barang = null;
+		
+		for(int i = 0; i< getBarangArrayListSize(); i++) {
+			if(getAllBarangList().get(i).getId_barang() == id_barang)
+				barang = getAllBarangList().get(i);
+		}
+		return barang;
+	}
+	
 	/**
 	 * Berfungsi utk mengolah JSONObject Barang menjadi var Barang.
 	 * @param jsonObject - String dengan format JSON dari Server
@@ -163,7 +174,7 @@ public class AppsController extends Application {
 	}
 	
 	/**
-	 * Menghapus seluruh isi data List Barang.
+	 * <strong>!!!</strong> Menghapus seluruh isi data List Barang.
 	 */
 	public void clearAllBarangList() {
 		barang_data_full.clear();
@@ -182,15 +193,14 @@ public class AppsController extends Application {
 
 	public void setList_supplier(Supplier list_supplier_full) {
 		this.list_supplier.add(list_supplier_full);
-	}
-	
+	}	
 	
 	/**
 	 * Memperoleh Nama Toko dari id yang diberikan.
 	 * @param id_supplier : ID Toko yang dimaksud.
 	 * @return supplier_name : Nama Toko
 	 */
-	public String getSupplierName(int id_supplier) {
+	public String getSupplierNameById(int id_supplier) {
 		
 		String supplier_name = "";
 		
@@ -200,14 +210,60 @@ public class AppsController extends Application {
 			}
 		}
 		
-		return supplier_name;
+		return !TextUtils.isEmpty(supplier_name) ? supplier_name : "Toko Tidak Dketahui";
 		
 	}
 	
-	////////////////////////////////////////////////////////////////
+	public int getSupplierListIndexByName(String supplier_name) {
+		
+		int index_supplier_list = 0;
+		
+		for(int i = 0; i < getList_supplier().size(); i++) {
+			if(getList_supplier().get(i).getNama_toko().equals(supplier_name)) {
+				index_supplier_list = i;
+			}
+		}
+		
+		return index_supplier_list;
+	}
+	
+	/**
+	 * !!! Clear All Supplier List
+	 */
+	public void clearAllSupplierList() {
+		list_supplier.clear();
+	}
 	///////////////////////SUPPLIER - END///////////////////////////
+	
 
 	
+	////////////////////////////////////////////////////////////////
+	////////////////////CATEGORY////////////////////////////////////
+	public List<String> getList_product_category() {
+		return list_product_category;
+	}
+
+	public void setList_product_category(String product_category) {
+		this.list_product_category.add(product_category);
+	}
+	
+	public int getProductCategoryListIndexByName(String category_name) {
+		
+		int index_category_list = 0;
+		
+		for(int i = 0; i < getList_product_category().size(); i++) {
+			if(getList_product_category().get(i).equals(category_name)) {
+				index_category_list = i;
+			}
+		}
+		
+		return index_category_list;
+		
+	}	
+	////////////////////CATEGORY - END//////////////////////////////
+	
+	
+
 	////////////////////////////////////////////////////////////////
 	///////////////////////BRAND////////////////////////////////////
 	public List<Brand> getList_brand() {
@@ -237,10 +293,8 @@ public class AppsController extends Application {
 			}
 		}
 		
-		return brand_name;
+		return !TextUtils.isEmpty(brand_name) ? brand_name : "No Brand";
 		
-	}
-	
-	////////////////////////////////////////////////////////////////
+	}	
 	///////////////////////BRAND - END//////////////////////////////
 }

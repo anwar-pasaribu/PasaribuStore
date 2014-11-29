@@ -33,7 +33,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.pasaribu.store.control.AppsController;
 import com.pasaribu.store.control.CustonJsonObjectRequest;
-import com.pasaribu.store.control.GetCloudData;
 import com.pasaribu.store.model_data.AppsConstanta;
 import com.pasaribu.store.model_data.Barang;
 import com.pasaribu.store.model_data.Brand;
@@ -50,7 +49,6 @@ public class Home extends Fragment implements CustomListHomeListener{
 	private ListView list_home, list_recently;	
 	private CustomListHome customListHome;	
 	private AppsController aController;
-	private GetCloudData getCloudData;
 	private CustonJsonObjectRequest dataBarang_jsonObjReq;
 	
 
@@ -66,9 +64,7 @@ public class Home extends Fragment implements CustomListHomeListener{
 		pDialog.setCancelable(false);
 		
 		//Application Controller, berisi data ter-share utk semua activity.
-		aController = (AppsController) getActivity().getApplicationContext();
-		
-		getCloudData = new GetCloudData();
+		aController = (AppsController) getActivity().getApplicationContext();		
 		
 		list_home = (ListView) android.findViewById(R.id.list_home);	
 		list_recently = (ListView) android.findViewById(R.id.list_recently);
@@ -82,9 +78,6 @@ public class Home extends Fragment implements CustomListHomeListener{
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				String list_content = parent.getAdapter().getItem(position).toString().trim();
-				
-				if(list_content.equals("Daftar IP"))
-					getBrandSupplierData();
 				
 				Toast.makeText(getActivity(), "List Recently : " + list_content, Toast.LENGTH_SHORT).show();
 				
@@ -103,24 +96,6 @@ public class Home extends Fragment implements CustomListHomeListener{
 		return android;
 	}
 
-
-	private void getBrandSupplierData() {
-		
-		Map<String, String> data_temp = new HashMap<String, String>();
-		data_temp.put("id_user", "1");
-		
-		//Mengambil data Brand dan Supplier dari MySQL kemudia mem-parse ke Apps Controller
-		getCloudData.requestJSONObject(AppsConstanta.URL_SUPPLIER_AND_BRAND, data_temp, "tag_brand_and_supplier");
-		
-		if(!(getCloudData.getJsonObject() == null)) {
-			parseBrandSupplierJSONObject( getCloudData.getJsonObject() );
-			Toast.makeText(getActivity(), "Data Sudah Masuk", Toast.LENGTH_LONG).show();
-		} else {
-			Toast.makeText(getActivity(), "Data Kosong", Toast.LENGTH_LONG).show();
-		}
-		
-	}
-	
 	
 	public void requestAllDataBarangJSONObject() {	
 		
@@ -188,11 +163,14 @@ public class Home extends Fragment implements CustomListHomeListener{
     		
     		if(!responseJsonObject.isNull(AppsConstanta.JSON_HEADER_BARANG) ) {
     			
+    			int i = 0;
+    			
 	    		JSONObject jsonResponse 		= new JSONObject(responseJsonObject.toString());    		
 	    		int data_barang_size_new 		= jsonResponse.getInt(AppsConstanta.JSON_HEADER_DATA_SIZE);
 	    		JSONArray jArray_dataBarang 	= jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BARANG);    		
 	    		JSONArray jArray_SupplierData 	= jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_SUPPLIER);
 	    		JSONArray jArray_BrandData 		= jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BRAND);
+	    		JSONArray jArray_CategoryData 	= jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_CATEGORY);
 
 	    		int jArray_dataBarang_length 	= jArray_dataBarang.length();
 	    		int data_barang_size_local 		= aController.getBarangArrayListSize();
@@ -204,7 +182,7 @@ public class Home extends Fragment implements CustomListHomeListener{
 	    			
 	    			if(data_barang_size_new > data_barang_size_local) {				
 	    						
-							for (int i = data_barang_size_local; i < jArray_dataBarang_length; i++ ) {							
+							for (i = data_barang_size_local; i < jArray_dataBarang_length; i++ ) {							
 								JSONObject jsonObject = jArray_dataBarang.getJSONObject(i);
 								aController.addToListBarangFull(aController.createBarangFromJSONObject(jsonObject));					
 							}
@@ -213,7 +191,7 @@ public class Home extends Fragment implements CustomListHomeListener{
 	    				
 	    				aController.clearAllBarangList();
 	    				
-	    				for (int i = 0; i < jArray_dataBarang_length; i++ ) {							
+	    				for (i = 0; i < jArray_dataBarang_length; i++ ) {							
 							JSONObject jsonObject = jArray_dataBarang.getJSONObject(i);
 							aController.addToListBarangFull(aController.createBarangFromJSONObject(jsonObject));					
 						}
@@ -226,44 +204,61 @@ public class Home extends Fragment implements CustomListHomeListener{
 	    		
 	    		//TODO: Untuk mengambil data dari JSONArray Supplier
 	    		int jArray_SupplierDataLength = jArray_SupplierData.length();
-				for (int i = 0; i < jArray_SupplierDataLength; i++ ) {
-					
-					JSONObject jsonObject = jArray_SupplierData.getJSONObject(i);
-					
-					aController.setList_supplier(new Supplier(
-							jsonObject.getInt(Supplier.ID_PENJUAL), 
-							jsonObject.getString(Supplier.NAMA_PENJUAL), 
-							jsonObject.getString(Supplier.NAMA_TOKO), 
-							jsonObject.getString(Supplier.ALAMAT_TOKO), 
-							jsonObject.getString(Supplier.GEOLOCATION), 
-							jsonObject.getString(Supplier.KONTAK_TOKO), 
-							jsonObject.getString(Supplier.EMAIL_TOKO) 
-							));	
-					
-									
-				}
+	    		if(aController.getList_supplier().size() != jArray_SupplierDataLength) {
+	    			
+	    			aController.clearAllSupplierList();
+	    			
+					for (i = 0; i < jArray_SupplierDataLength; i++ ) {						
+						JSONObject jsonObject = jArray_SupplierData.getJSONObject(i);						
+						aController.setList_supplier(new Supplier(
+								jsonObject.getInt(Supplier.ID_PENJUAL), 
+								jsonObject.getString(Supplier.NAMA_PENJUAL), 
+								jsonObject.getString(Supplier.NAMA_TOKO), 
+								jsonObject.getString(Supplier.ALAMAT_TOKO), 
+								jsonObject.getString(Supplier.GEOLOCATION), 
+								jsonObject.getString(Supplier.KONTAK_TOKO), 
+								jsonObject.getString(Supplier.EMAIL_TOKO) 
+								));	
+						
+										
+					}
+	    		}
 				
 				//TODO: Untuk mengambil data dari JSONArray Brand
 	    		int jArray_BrandDataLength = jArray_BrandData.length();
-				for (int i = 0; i < jArray_BrandDataLength; i++ ) {
-					
-					JSONObject jsonObject = jArray_BrandData.getJSONObject(i);
-					
-					aController.setList_brand(new Brand(
-							jsonObject.getInt(Brand.ID_MEREK), 
-							jsonObject.getString(Brand.NAMA_MEREK), 
-							jsonObject.getString(Brand.LOGO_MEREK), 
-							jsonObject.getString(Brand.DESKRIPSI_MEREK) 
-							));	
-					
-									
-				}
+	    		if(aController.getList_brand().size() != jArray_BrandDataLength) {
+	    			
+	    			aController.getList_brand().clear();
+	    			
+					for (i = 0; i < jArray_BrandDataLength; i++ ) {						
+						JSONObject jsonObject = jArray_BrandData.getJSONObject(i);						
+						aController.setList_brand(new Brand(
+								jsonObject.getInt(Brand.ID_MEREK), 
+								jsonObject.getString(Brand.NAMA_MEREK), 
+								jsonObject.getString(Brand.LOGO_MEREK), 
+								jsonObject.getString(Brand.DESKRIPSI_MEREK) 
+								));	
+						
+										
+					}
+	    		}
+				
+				//TODO: Untuk mengambil data dari JSONArray Category
+	    		int jArray_CategoryDataLength = jArray_CategoryData.length();
+	    		if(aController.getList_product_category().size() != jArray_CategoryDataLength) {
+	    			
+	    			aController.getList_product_category().clear();
+	    			
+					for (i = 0; i < jArray_CategoryDataLength; i++ ) {					
+						JSONObject jsonObject = jArray_CategoryData.getJSONObject(i);					
+						aController.setList_product_category(jsonObject.getString("kategori_barang"));									
+					}
+	    		}
 	
 				
-				Log.i(TAG, "Ukuran Data : " + data_barang_size_new);
-			
-				
-				
+				Log.i(TAG, "Ukuran Data Barang : " + data_barang_size_new);
+				Log.i(TAG, "Ukuran Data Supplier jArray : " + jArray_SupplierDataLength + ", aController : " + aController.getList_supplier().size());
+				Log.i(TAG, "Ukuran Data Brand jArray : " + jArray_BrandDataLength + ", aController : " + aController.getList_brand().size());
     		} 			
 			
 		} catch (Exception e) {
@@ -276,58 +271,6 @@ public class Home extends Fragment implements CustomListHomeListener{
     	
     	
 	} //END - Parse JSONObject Data Barang 	
-	
-	
-	private void parseBrandSupplierJSONObject(JSONObject responseJsonObject) {
-		Log.i(TAG, "( Parse data Brand dan Supplier ) Data : " + responseJsonObject.toString());
-		
-		try {
-    		
-    		JSONObject jsonResponse = new JSONObject(responseJsonObject.toString());    		
-    		JSONArray jArray_SupplierData = jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_SUPPLIER);
-    		JSONArray jArray_BrandData = jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BRAND);
-    		
-			//TODO: Untuk mengambil data dari JSONArray Supplier
-    		int jArray_SupplierDataLength = jArray_SupplierData.length();
-			for (int i = 0; i < jArray_SupplierDataLength; i++ ) {
-				
-				JSONObject jsonObject = jArray_SupplierData.getJSONObject(i);
-				
-				aController.setList_supplier(new Supplier(
-						jsonObject.getInt(Supplier.ID_PENJUAL), 
-						jsonObject.getString(Supplier.NAMA_PENJUAL), 
-						jsonObject.getString(Supplier.NAMA_TOKO), 
-						jsonObject.getString(Supplier.ALAMAT_TOKO), 
-						jsonObject.getString(Supplier.GEOLOCATION), 
-						jsonObject.getString(Supplier.KONTAK_TOKO), 
-						jsonObject.getString(Supplier.EMAIL_TOKO) 
-						));	
-				
-								
-			}
-			
-			//TODO: Untuk mengambil data dari JSONArray Brand
-    		int jArray_BrandDataLength = jArray_BrandData.length();
-			for (int i = 0; i < jArray_BrandDataLength; i++ ) {
-				
-				JSONObject jsonObject = jArray_BrandData.getJSONObject(i);
-				
-				aController.setList_brand(new Brand(
-						jsonObject.getInt(Brand.ID_MEREK), 
-						jsonObject.getString(Brand.NAMA_MEREK), 
-						jsonObject.getString(Brand.LOGO_MEREK), 
-						jsonObject.getString(Brand.DESKRIPSI_MEREK) 
-						));	
-				
-								
-			}
-			
-		} catch (Exception e) {
-			Log.e(TAG, "Tidak dapat mengambil data JSONObject Brand dan Supplier. Message : " + e.getMessage());
-		}
-		
-	} 
-	
 	
 	
 	/**

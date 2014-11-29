@@ -44,6 +44,8 @@ public class CustomListHome
 	private final static int ROW_LAYOUT = R.layout.list_item_home;
 	private CustomListHomeListener custListHomeListener;
 	
+	private int position = 0;
+	
 	
 	public CustomListHome(Context context, List<Barang> data) {
 		super(context, ROW_LAYOUT, data);
@@ -52,6 +54,7 @@ public class CustomListHome
 		
 	}
 	
+	//////////////////////////////////////////////////////////////////////
 	//Membuat Interface Callback utk dapat digunakan oleh
 	//Home.java
 	public void setCallBack(CustomListHomeListener custListHomeListener) {
@@ -61,7 +64,7 @@ public class CustomListHome
 	public interface CustomListHomeListener {
 		public void deleteDataBarangSuccess(boolean status);
 	}
-	
+	///////////////////////////////////////////////////////////////////////
 	
 	
 
@@ -86,6 +89,7 @@ public class CustomListHome
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
+		this.position = position;	
 		String text_product_stock_price = "";
 		
 		View 			itemView = convertView;
@@ -193,6 +197,7 @@ public class CustomListHome
 						
 						Intent intentEditDataBarang = new Intent(context, EditDataBarang.class);
 						intentEditDataBarang.putExtra(Barang.ID_BARANG, id_barang);
+						intentEditDataBarang.putExtra("list_barang_index", position);
 						context.startActivity(intentEditDataBarang);
 						
 						break;
