@@ -29,6 +29,7 @@ public class Main extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        
         //TODO Inisialisasi Kelas yang akan digunakan pada main class
         
         displayGui = new DisplayGui(this); //Kelas untuk menampilkan GUI pada aplikasi
