@@ -2,11 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_scroll_add_data_barang"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-     >
+    android:layout_height="match_parent" >
 
     <LinearLayout
-        android:id="@+id/LinearLayout_utama_add_data_barang"
+        android:id="@+id/LinearLayout_utama_adit_data_barang"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -16,13 +15,36 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         tools:context="com.pasaribu.store.EditDataBarang" >
 
-        <TextView
-            android:id="@+id/title_edit_data_barang"
+        <RelativeLayout
+            android:id="@+id/layout_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_8dp"
             android:layout_marginStart="@dimen/margin_8dp"
-            android:text="@string/title_edit_data_barang"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+             >
+            
+            <TextView
+                android:id="@+id/title_edit_data_barang"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="@string/title_edit_data_barang"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <Button
+                android:id="@+id/button_tgl_stok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:background="@android:color/transparent"
+                android:text="Tgl. Produk"
+                tools:ignore="HardcodedText" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/lbl_product_name"
@@ -61,6 +83,7 @@
             android:id="@+id/lbl_product_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_8dp"
             android:layout_marginStart="@dimen/margin_8dp"
             android:layout_marginTop="@dimen/margin_top_lbl"
             android:text="@string/lable_product_price" />
@@ -116,7 +139,6 @@
                 android:ems="10"
                 android:hint="@string/hint_product_unit"
                 android:inputType="textAutoComplete" />
-
         </LinearLayout>
 
         <TextView
