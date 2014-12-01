@@ -96,7 +96,7 @@ public class ProductDetail extends Activity {
 	 */
 	private void setTextViewContents() {
 		//Ambil data barang pada pada index tertentu dari Application Controller
-		active_productData = aController.getBarangAtPosition(list_barang_index);
+		active_productData = aController.getBarangById(id_barang);
 		
 		String product_brand = aController.getBrandName(active_productData.getId_merek());
 		String store_name = aController.getSupplierNameById(active_productData.getId_penjual());
@@ -176,9 +176,16 @@ public class ProductDetail extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+		
+		switch (id) {
+		case R.id.action_settings:
+			
+			break;
+
+		default:
+			break;
 		}
+		
 		return super.onOptionsItemSelected(item);
 	}
 	/////////////////////////////////////////////////////////////////////////

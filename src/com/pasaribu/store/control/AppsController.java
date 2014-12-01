@@ -121,7 +121,7 @@ public class AppsController extends Application {
 		return barang_data_full.get(position);
 	}
 	
-	public Barang getBrangById(int id_barang) {
+	public Barang getBarangById(int id_barang) {
 		
 		Barang barang = null;
 		

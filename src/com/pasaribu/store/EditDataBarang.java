@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -26,6 +27,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -38,6 +40,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.pasaribu.store.control.AppsController;
 import com.pasaribu.store.control.CustonJsonObjectRequest;
+import com.pasaribu.store.control.Helper;
 import com.pasaribu.store.model_data.AppsConstanta;
 import com.pasaribu.store.model_data.Barang;
 
@@ -65,12 +68,16 @@ public class EditDataBarang extends Activity
 	private Spinner		spinner_product_category,
 						spinner_supplier;
 	
-	private Button btn_add_supplier;
+	private Button btn_add_supplier, btn_tgl_stok;
 	
 	private List<String> list_data_category = new ArrayList<String>();
 	private List<String> list_data_supplier = new ArrayList<String>();
 	private List<String> list_data_product_unit = new ArrayList<String>();
 	private List<String> list_data_brand = new ArrayList<String>();
+	
+	// Variable utk menyimpan tanggal
+    private int mYear, mMonth, mDay;
+    private String stok_date = "";
 
 	private String supplier;
 	private String kategori;
@@ -86,13 +93,13 @@ public class EditDataBarang extends Activity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.add_data_barang);
+		setContentView(R.layout.activity_edit_data_barang);
 		
 		aController = (AppsController) getApplicationContext();
 		id_barang 	= getIntent().getExtras().getInt(Barang.ID_BARANG);
 		list_barang_index = getIntent().getExtras().getInt("list_barang_index");
 		
-		active_productData = aController.getBrangById(id_barang);
+		active_productData = aController.getBarangById(id_barang);
 		
 		intializeWidget();
 		
@@ -111,7 +118,14 @@ public class EditDataBarang extends Activity
 		//Memberikan Click Listener pada view
 		spinner_product_category.setOnItemSelectedListener(this);
 		spinner_supplier.setOnItemSelectedListener(this);
-		btn_add_supplier.setOnClickListener(this);		
+		btn_add_supplier.setOnClickListener(this);
+		btn_tgl_stok.setOnClickListener(this);
+		
+		// Process to get Current Date
+        final Calendar c = Calendar.getInstance();
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
 		
 		list_data_product_unit.add("Kotak");
 		list_data_product_unit.add("Lusin");
@@ -140,6 +154,7 @@ public class EditDataBarang extends Activity
 		spinner_product_category = (Spinner) findViewById(R.id.spinner_product_category);
 		spinner_supplier = (Spinner) findViewById(R.id.spinner_supplier);		
 		btn_add_supplier = (Button) findViewById(R.id.btn_add_supplier);
+		btn_tgl_stok = (Button) findViewById(R.id.button_tgl_stok);
 	}
 	
 	private void setFormContents() {
@@ -151,6 +166,9 @@ public class EditDataBarang extends Activity
 		//Mengambil index product_category dan supplier
 		int index_category_spinner = aController.getProductCategoryListIndexByName(active_productData.getKategori_barang());
 		int index_supplier_spinner = aController.getSupplierListIndexByName(store_name);
+		
+		//Ubah teks Tombol (Tanggal di Title)
+		btn_tgl_stok.setText( Helper.getIndonesianDate(active_productData.getTgl_stok_barang() ) );
 				
 		editText_product_name.setText(active_productData.getNama_barang());
 		autoComp_product_brand.setText( product_brand );
@@ -212,7 +230,7 @@ public class EditDataBarang extends Activity
 	/**
 	 * Untuk mengisi for dengan data barang yang sedang aktif
 	 */
-	private void getFormData() {
+	private void getFormDataAndSend() {
 		
 		String product_name 	= editText_product_name.getText().toString();		
 		String product_brand 	= autoComp_product_brand.getText().toString(); 
@@ -243,19 +261,15 @@ public class EditDataBarang extends Activity
 			}
 		}
 		
-		//Membuat string tanggal sekarang
-		Calendar now = Calendar.getInstance();
-		int month = now.get(Calendar.MONTH) + 1;
-		int day = now.get(Calendar.DAY_OF_MONTH);
-		int year = now.get(Calendar.YEAR);
+		//Tanggal dari dialog atau data asli
+		String tanggal_mysql = !stok_date.matches("") && !stok_date.equals(active_productData.getTgl_stok_barang()) ? stok_date : active_productData.getTgl_stok_barang();
 		
-		String tanggal_mysql = year+"-"+month+"-"+day;
-		final int RADIX = 10;
-		
+		final int RADIX = 10;		
 		
 		Map<String, String> data_barang_to_edit = new HashMap<String, String>();
 		//Data utk id_barang AUTOINCREMENT di server
 		
+		data_barang_to_edit.put(Barang.ID_BARANG, active_productData.getId_barang()+""); 
 		data_barang_to_edit.put(Barang.ID_USER, "1"); //TODO Guna - User Aktif diasumsikan!
 		
 		//periksa perubahan data yang dibuat sehingga data yg di kirim hanya yang perubahan
@@ -300,25 +314,18 @@ public class EditDataBarang extends Activity
 		if(!active_productData.getDeskripsi_barang().equals(product_description))
 			data_barang_to_edit.put(Barang.DESKRIPSI_BARANG, product_description);
 		
+		int data_barang_to_edit_size = data_barang_to_edit.size();
 		
-//		data_barang_to_edit.put(Barang.ID_MEREK, product_brand);
-//		data_barang_to_edit.put(Barang.ID_PENJUAL, product_supplier);
-//		data_barang_to_edit.put(Barang.ID_GAMBAR, "0"); //TODO Ingat, utk sekarang gambar masih kosong
-//		data_barang_to_edit.put(Barang.NAMA_BARANG, product_name);
-//		data_barang_to_edit.put(Barang.STOK_BARANG, product_stock + "");
-//		data_barang_to_edit.put(Barang.SATUAN_BARANG, product_unit);
-//		data_barang_to_edit.put(Barang.HARGA_BARANG, product_price);
-//		data_barang_to_edit.put(Barang.TGL_HARGA_STOK_BARANG, tanggal_mysql);
-//		data_barang_to_edit.put(Barang.KODE_BARANG, "KODE");
-//		data_barang_to_edit.put(Barang.LOKASI_BARANG, "LOKASI");
-//		data_barang_to_edit.put(Barang.KATEGORI_BARANG, product_category);
-//		data_barang_to_edit.put(Barang.DESKRIPSI_BARANG, product_description);
-//		data_barang_to_edit.put(Barang.FAVORITE, "0"); //Default status favorite utk Barang Adalah 0
+		if(data_barang_to_edit_size != 2) {
+			Log.i(TAG, "Ukuran Data yang akan di kirim : " + data_barang_to_edit.size() );
+			Log.i(TAG, "Data yang akan di kirim : " + data_barang_to_edit.toString() );
+			
+			//TODO Remind - Akses jaringan hanya jika terkoneksi jaringan
+			jsonObjectAccess(AppsConstanta.URL_UPDATE_PRODUCT, data_barang_to_edit);
+		} else {
+			Toast.makeText(getApplicationContext(), "Tidak ada perubahan data.", Toast.LENGTH_LONG).show();
+		}
 		
-		Log.i(TAG, "Data yang akan di kirim : " + data_barang_to_edit.toString());
-		
-		//Periksa perubahan yg terjadi pada data
-		//detectDataChanges(data_barang_to_edit);
 		
 	}
 
@@ -339,7 +346,7 @@ public class EditDataBarang extends Activity
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.add_data_barang, menu);
+		getMenuInflater().inflate(R.menu.edit_data_barang, menu);
 		return true;
 	}
 
@@ -349,7 +356,7 @@ public class EditDataBarang extends Activity
 		int id = item.getItemId();
 		
 		switch (id) {
-		case R.id.option_done_adding:
+		case R.id.action_done_editing:
 			
 			// Aksi menyimpan data ke SQLite, ke MySQL jika online.
 			// Pertama periksa dulu formulir
@@ -357,7 +364,7 @@ public class EditDataBarang extends Activity
 				
 				if(aController.isNetworkAvailable()) {
 					
-					getFormData(); 
+					getFormDataAndSend(); 
 					
 				} else {
 					//TODO Remind - Lakukan penyimpanan ke SQLite. Utk sekarang masih fokus MySQL
@@ -427,9 +434,41 @@ public class EditDataBarang extends Activity
 		switch (id) {
 		case R.id.btn_add_supplier:
 			
-			//TODO Jika mengklik tombol Tambah Penjual, dialog akan dibuka
+			//Jika mengklik tombol Tambah Penjual, dialog akan dibuka
 			final DialogFragment dialogAddSupplier = new DialogAddSupplier();
 			dialogAddSupplier.show(getFragmentManager(), "add_supplier");
+			
+			break;
+		case R.id.button_tgl_stok:
+			//Ubah nilai mYear, mMonth, mDay bernilai data barang
+			String[] product_date = active_productData.getTgl_stok_barang().split("-");
+			mYear = Integer.parseInt(product_date[0]);
+			mMonth = Integer.parseInt(product_date[1])-1; //Dihitung dari nol
+			mDay = Integer.parseInt(product_date[2]);
+			
+			
+			// Launch Date Picker Dialog (11-30-2014)
+            DatePickerDialog dpd = new DatePickerDialog(this,
+                    new DatePickerDialog.OnDateSetListener() {
+ 
+                        @Override
+                        public void onDateSet(DatePicker view, int year,
+                                int monthOfYear, int dayOfMonth) {
+                        	
+                            //Ubah stok_date                            
+                            stok_date = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                            btn_tgl_stok.setText(Helper.getIndonesianDate(stok_date));
+                            
+                            Toast.makeText(getApplicationContext(), "Tanggal di ubah menjadi :\n " + Helper.getIndonesianDate(stok_date), Toast.LENGTH_LONG).show();
+                            
+ 
+                        }
+                        
+                        
+                    }, mYear, mMonth, mDay);
+            dpd.setTitle("Ubah Tanggal Stok Barang");
+            dpd.setCancelable(true);
+            dpd.show();
 			
 			break;
 
@@ -441,7 +480,7 @@ public class EditDataBarang extends Activity
 
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog, Map<String, String> new_supplier_data) {
-		// TODO Menangani positive action saat membuka dialog add supplier.
+		// Menangani positive action saat membuka dialog add supplier.
 		// Data yg diperoleh adalah 
 		
 		String str_nama_toko = new_supplier_data.get(AppsConstanta.KEY_NAMA_TOKO).toString();
@@ -565,22 +604,22 @@ public class EditDataBarang extends Activity
 	//Fungsi untuk validasi form add barang
 	private boolean validateProductForm() {
 		
-		LinearLayout linearLayout_utama_add_data_barang = (LinearLayout) findViewById(R.id.LinearLayout_utama_add_data_barang);
+		LinearLayout linearLayout_utama_edit_data_barang = (LinearLayout) findViewById(R.id.LinearLayout_utama_adit_data_barang);
 		
 		ArrayList<EditText> list_editText = new ArrayList<EditText>();
 		ArrayList<AutoCompleteTextView> list_autoCompleteTextView = new ArrayList<AutoCompleteTextView>();
 		
 		//Mengambil view dari form
-		for(int i = 0; i < linearLayout_utama_add_data_barang.getChildCount(); i++) {
+		for(int i = 0; i < linearLayout_utama_edit_data_barang.getChildCount(); i++) {
 			
-			if(linearLayout_utama_add_data_barang.getChildAt(i) instanceof EditText) { 
-				list_editText.add( (EditText) linearLayout_utama_add_data_barang.getChildAt(i) );
+			if(linearLayout_utama_edit_data_barang.getChildAt(i) instanceof EditText) { 
+				list_editText.add( (EditText) linearLayout_utama_edit_data_barang.getChildAt(i) );
 			}
-			else if ( linearLayout_utama_add_data_barang.getChildAt(i) instanceof AutoCompleteTextView ) {
-				list_autoCompleteTextView.add((AutoCompleteTextView) linearLayout_utama_add_data_barang.getChildAt(i) );
-			} else if ( linearLayout_utama_add_data_barang.getChildAt(i) instanceof LinearLayout ) {
+			else if ( linearLayout_utama_edit_data_barang.getChildAt(i) instanceof AutoCompleteTextView ) {
+				list_autoCompleteTextView.add((AutoCompleteTextView) linearLayout_utama_edit_data_barang.getChildAt(i) );
+			} else if ( linearLayout_utama_edit_data_barang.getChildAt(i) instanceof LinearLayout ) {
 				
-				LinearLayout myLayout = (LinearLayout) linearLayout_utama_add_data_barang.getChildAt(i);
+				LinearLayout myLayout = (LinearLayout) linearLayout_utama_edit_data_barang.getChildAt(i);
 				
 				for(int j = 0; j < myLayout.getChildCount(); j++) {
 					

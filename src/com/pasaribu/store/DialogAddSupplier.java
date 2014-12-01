@@ -2,7 +2,7 @@ package com.pasaribu.store;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,14 +12,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
-
 import com.pasaribu.store.model_data.AppsConstanta;
 
 public class DialogAddSupplier extends DialogFragment {
 	
 	private EditText editText_supplier_name, editText_supplier_address, editText_supplier_contact;
-	private TextView lbl_supplier_name, lbl_supplier_address, lbl_supplier_contact;
 	private DialogAddSupplierListener mListener;
 	
 	private Map<String, String> data_to_send = new HashMap<String, String>();
@@ -46,6 +43,7 @@ public class DialogAddSupplier extends DialogFragment {
 
 	
 	
+	@SuppressLint("InflateParams")
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -55,10 +53,6 @@ public class DialogAddSupplier extends DialogFragment {
 		editText_supplier_name = (EditText) dialogAddSupplier.findViewById(R.id.editText_supplier_name);
 		editText_supplier_address = (EditText) dialogAddSupplier.findViewById(R.id.editText_supplier_address);
 		editText_supplier_contact = (EditText) dialogAddSupplier.findViewById(R.id.editText_supplier_contact);
-
-		lbl_supplier_name = (TextView) dialogAddSupplier.findViewById(R.id.lbl_supplier_name);
-		lbl_supplier_address = (TextView) dialogAddSupplier.findViewById(R.id.lbl_supplier_address);
-		lbl_supplier_contact = (TextView) dialogAddSupplier.findViewById(R.id.lbl_supplier_contact);
 		
 
 	    // Inflate and set the layout for the dialog
@@ -83,11 +77,7 @@ public class DialogAddSupplier extends DialogFragment {
 	            	   //Memberikan fitur fositif klik pada AddBarang Activity sekaligus mengirim data dari form.
 	            	   mListener.onDialogPositiveClick(DialogAddSupplier.this, data_to_send);
 	            	   
-	               }          
-	               
-
-				
-				
+	               }				
 	           })
 	           .setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
 	               public void onClick(DialogInterface dialog, int id) {

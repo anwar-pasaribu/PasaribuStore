@@ -1,7 +1,6 @@
 package com.pasaribu.store;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.pasaribu.store.control.AppsController;
 import com.pasaribu.store.control.CustonJsonObjectRequest;
+import com.pasaribu.store.control.Helper;
 import com.pasaribu.store.model_data.AppsConstanta;
 import com.pasaribu.store.model_data.Barang;
 import com.pasaribu.store.model_data.Brand;
@@ -102,10 +102,10 @@ public class AddDataBarang extends Activity
 		btn_add_supplier.setOnClickListener(this);
 		
 		//TODO Membuat list kategori. Berikutnya data diperoleh dari database
-		list_data_category.add("Elektronik");
-		list_data_category.add("Automotif");
-		list_data_category.add("Chainsaw");
-		list_data_category.add("Lainnya");
+//		list_data_category.add("Elektronik");
+//		list_data_category.add("Automotif");
+//		list_data_category.add("Chainsaw");
+//		list_data_category.add("Lainnya");
 		
 		//Mengisi data autoComp dan Spinner
 		populateFormData();
@@ -208,14 +208,9 @@ public class AddDataBarang extends Activity
 				product_supplier = String.valueOf( aController.getList_supplier().get(i).getId_penjual() );
 			}
 		}
+				
 		
-		//Membuat string tanggal sekarang
-		Calendar now = Calendar.getInstance();
-		int month = now.get(Calendar.MONTH) + 1;
-		int day = now.get(Calendar.DAY_OF_MONTH);
-		int year = now.get(Calendar.YEAR);
-		
-		String tanggal_mysql = year+"-"+month+"-"+day;
+		String tanggal_mysql = Helper.getMySQLDateFormat();
 		
 		
 		Map<String, String> data_barang_to_send = new HashMap<String, String>();

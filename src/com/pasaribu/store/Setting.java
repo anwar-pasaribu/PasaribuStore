@@ -15,7 +15,7 @@ import android.widget.TextView;
 public class Setting extends Activity implements TextWatcher{
 
 	private EditText editText_ipAddress;
-	private TextView lbl_ipAddress, textView_url;
+	private TextView textView_url;
 	
 	AppsController aController;
 	AppsConstanta aConstanta;
@@ -30,7 +30,6 @@ public class Setting extends Activity implements TextWatcher{
 		
 		
 		editText_ipAddress = (EditText) findViewById(R.id.editText_ipAdress);
-		lbl_ipAddress = (TextView) findViewById(R.id.lbl_ipAddress);
 		textView_url = (TextView) findViewById(R.id.textView_tampilanUrl);
 		
 		editText_ipAddress.addTextChangedListener(this);

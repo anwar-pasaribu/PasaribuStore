@@ -43,6 +43,7 @@ public class AppsConstanta {
 	public static String URL_DATA 				= "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/get_home_data.php"; 
 	public static String URL_INSERT_SUPPLIER 	= "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/insert_supplier.php"; 
 	public static String URL_INSERT_PRODUCT 	= "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/insert_product.php"; 
+	public static String URL_UPDATE_PRODUCT 	= "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/update_product.php"; 
 	public static String URL_DELETE_PRODUCT 	= "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/delete_product.php"; 
 	public static String URL_SUPPLIER_AND_BRAND = "http://"+ MANUAL_IP_ADDRESS +"/pasaribu_store/function/get_supplier_and_brand.php";  //Ambil data supplier
 	

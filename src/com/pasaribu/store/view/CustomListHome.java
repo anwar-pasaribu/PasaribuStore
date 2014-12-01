@@ -29,6 +29,7 @@ import com.pasaribu.store.EditDataBarang;
 import com.pasaribu.store.R;
 import com.pasaribu.store.control.AppsController;
 import com.pasaribu.store.control.CustonJsonObjectRequest;
+import com.pasaribu.store.control.Helper;
 import com.pasaribu.store.model_data.AppsConstanta;
 import com.pasaribu.store.model_data.Barang;
 
@@ -125,7 +126,7 @@ public class CustomListHome
 		//Format teks utk text_product_stock_date TextView
 		text_product_stock_price = 	dataAktif.getStok_barang() 
 									+ " " + dataAktif.getSatuan_barang() 
-									+ " - " + dataAktif.getTgl_stok_barang(); //TODO Buat fungsi pengubah tgl MySQL ke format indonesia
+									+ " - " + Helper.getIndonesianDate(dataAktif.getTgl_stok_barang()); //TODO Buat fungsi pengubah tgl MySQL ke format indonesia
 				
 		holder.text_product_name.setText(dataAktif.getNama_barang());
 		holder.text_product_price.setText("Rp " + dataAktif.getHarga_barang());
