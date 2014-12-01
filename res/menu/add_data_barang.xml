@@ -3,7 +3,7 @@
     tools:context="com.pasaribu.store.AddDataBarang" >
 
     <item
-        android:icon="@android:drawable/ic_menu_save"
+        android:icon="@android:drawable/ic_input_add"
         android:id="@+id/option_done_adding"
         android:title="@string/option_done_adding"
         android:showAsAction="ifRoom">
