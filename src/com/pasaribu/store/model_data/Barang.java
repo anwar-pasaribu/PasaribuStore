@@ -33,7 +33,7 @@ public class Barang {
 	public static String LOKASI_BARANG = "lokasi_barang";
 	public static String KATEGORI_BARANG = "kategori_barang";
 	public static String DESKRIPSI_BARANG = "deskripsi_barang";
-	public static String FAVORITE = "favorite";
+	public static String FAVORITE = "id_favorite";
 	
 	
 	

@@ -26,7 +26,6 @@ import com.pasaribu.store.model_data.Supplier;
  */
 public class AppsController extends Application {
 	
-	//From androidhive.com
 	public static final String TAG = AppsController.class.getSimpleName();
 	private RequestQueue queue;
 	private ImageLoader mImageLoader;	

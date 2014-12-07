@@ -280,22 +280,6 @@ public class Home extends Fragment implements CustomListHomeListener{
 	 */
 	private void populateListDataBarang()  {	
 		
-//		Map<String, String> data_request = new HashMap<String, String>();
-//		data_request.put("id_user", "1"); //TODO Guna - Asumsikan user aktif dengan id_user = 1
-//		
-//		getCloudData.requestJSONObject(AppsConstanta.URL_DATA, data_request);
-//		JSONObject received_JSONObject = getCloudData.getJsonObject();
-//		
-//		//Periksa JSONObject, Apakah Ada?
-//		if( !isNullJSONObject(received_JSONObject) ) {
-//			parseJSONObject(received_JSONObject);
-//		} else {
-//			
-//		}
-//		
-		
-		
-		
 		int data_size = aController.getBarangArrayListSize();		
 		
 		if (data_size > 0) {
