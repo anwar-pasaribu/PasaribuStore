@@ -26,6 +26,7 @@ public class AppsConstanta {
 	public static String JSON_HEADER_LAST_INSERTED_ID = "LAST_INSERTED_ID";
 	public static String JSON_HEADER_QUERY = "QUERY";
 	public static String JSON_HEADER_MESSAGE = "msg";
+	public static String JSON_HEADER_END_OF_DATA = "END_OF_DATA";
 	
 	//Isi Pesan dari server
 	public static String MESSAGE_SUCCESS = "Berhasil";

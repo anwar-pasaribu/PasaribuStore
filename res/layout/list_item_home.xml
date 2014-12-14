@@ -27,11 +27,11 @@
         android:layout_marginStart="@dimen/margin_8dp"
         android:layout_marginTop="@dimen/margin_16dp"
         android:layout_toEndOf="@+id/image_product"
-        android:layout_toStartOf="@+id/btn_more_option"
         android:layout_toLeftOf="@+id/btn_more_option"
         android:layout_toRightOf="@+id/image_product"
+        android:layout_toStartOf="@+id/btn_more_option"
         android:ellipsize="middle"
-        android:text="Nama Product Yang Sangat Panjang Sehingga Akan Merusak Jika Tidak"
+        android:text="Nama Product Yang Sangat Panjang Sehingga Akan Merusak Jika Tidak Ditangani dengan baik dan Benar"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -41,7 +41,7 @@
         android:layout_alignLeft="@+id/text_product_name"
         android:layout_alignStart="@+id/text_product_name"
         android:layout_below="@+id/text_product_name"
-        android:layout_marginTop="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_4dp"
         android:text="Rp 45 000,"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -75,21 +75,6 @@
         android:focusableInTouchMode="false"
         android:src="@drawable/ic_overflow" />
 
-    <ImageView
-        android:id="@+id/image_status_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="@dimen/margin_16dp"
-        android:layout_marginLeft="@dimen/margin_16dp"
-        android:layout_marginTop="@dimen/margin_16dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/image_button_description"
-        android:maxWidth="20dp"
-        android:src="@android:drawable/btn_star" />
-
     <LinearLayout
         android:id="@+id/layout_product_category_horizontal_scroller"
         android:layout_width="wrap_content"
@@ -108,5 +93,18 @@
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/image_status_favorite"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/margin_16dp"
+        android:layout_marginStart="@dimen/margin_16dp"
+        android:layout_marginTop="@dimen/margin_32dp"
+        android:contentDescription="@string/image_button_description"
+        android:src="@drawable/tag_color_ungu" />
 
 </RelativeLayout>

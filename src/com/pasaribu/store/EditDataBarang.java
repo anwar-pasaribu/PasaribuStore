@@ -287,20 +287,30 @@ public class EditDataBarang extends Activity
 		if(active_productData.getId_gambar() != 0) 
 			data_barang_to_edit.put(Barang.ID_GAMBAR, "0");
 		
-		if(!active_productData.getNama_barang().equals(product_name))
+		if(!active_productData.getNama_barang().equals(product_name)) {
 			data_barang_to_edit.put(Barang.NAMA_BARANG, product_name);
+			active_productData.setNama_barang(product_name);
+		}
 		
-		if(active_productData.getStok_barang() != Integer.parseInt(product_stock))
+		if(active_productData.getStok_barang() != Integer.parseInt(product_stock)) {
 			data_barang_to_edit.put(Barang.STOK_BARANG, product_stock);
+			active_productData.setStok_barang(Integer.parseInt(product_stock));
+		}
 		
-		if(!active_productData.getSatuan_barang().equals(product_unit))
+		if(!active_productData.getSatuan_barang().equals(product_unit)) {
 			data_barang_to_edit.put(Barang.SATUAN_BARANG, product_unit);
+			active_productData.setSatuan_barang(product_unit);
+		}
 		
-		if(active_productData.getHarga_barang() != Integer.parseInt(product_price))
+		if(active_productData.getHarga_barang() != Integer.parseInt(product_price)) {
 			data_barang_to_edit.put(Barang.HARGA_BARANG, product_price);
+			active_productData.setHarga_barang(Integer.parseInt(product_price));
+		}
 		
-		if(!active_productData.getTgl_stok_barang().equals(tanggal_mysql))
+		if(!active_productData.getTgl_stok_barang().equals(tanggal_mysql)) {
 			data_barang_to_edit.put(Barang.TGL_HARGA_STOK_BARANG, tanggal_mysql);
+			active_productData.setTgl_stok_barang(tanggal_mysql);
+		}
 		
 		if(!active_productData.getKode_barang().matches("KODE"))
 			data_barang_to_edit.put(Barang.KODE_BARANG, "KODE");
@@ -308,20 +318,27 @@ public class EditDataBarang extends Activity
 		if(!active_productData.getLokasi_barang().matches("LOKASI"))
 			data_barang_to_edit.put(Barang.LOKASI_BARANG, "LOKASI");
 		
-		if(!active_productData.getKategori_barang().equals(product_category))
+		if(!active_productData.getKategori_barang().equals(product_category)) {
 			data_barang_to_edit.put(Barang.KATEGORI_BARANG, product_category);
+			active_productData.setKategori_barang(product_category);
+		}
 		
-		if(!active_productData.getDeskripsi_barang().equals(product_description))
+		if(!active_productData.getDeskripsi_barang().equals(product_description)) {
 			data_barang_to_edit.put(Barang.DESKRIPSI_BARANG, product_description);
+			active_productData.setDeskripsi_barang(product_description);
+		}
 		
 		int data_barang_to_edit_size = data_barang_to_edit.size();
 		
 		if(data_barang_to_edit_size != 2) {
-			Log.i(TAG, "Ukuran Data yang akan di kirim : " + data_barang_to_edit.size() );
-			Log.i(TAG, "Data yang akan di kirim : " + data_barang_to_edit.toString() );
-			
 			//TODO Remind - Akses jaringan hanya jika terkoneksi jaringan
-			jsonObjectAccess(AppsConstanta.URL_UPDATE_PRODUCT, data_barang_to_edit);
+			if(aController.isNetworkAvailable())
+				jsonObjectAccess(AppsConstanta.URL_UPDATE_PRODUCT, data_barang_to_edit);
+			else {
+				Log.e(TAG, "No network, database can not change");
+				aController.setBarangAtPosition(list_barang_index, active_productData);
+			}
+			
 		} else {
 			Toast.makeText(getApplicationContext(), "Tidak ada perubahan data.", Toast.LENGTH_LONG).show();
 		}
@@ -329,6 +346,12 @@ public class EditDataBarang extends Activity
 		
 	}
 
+	/**
+	 * Untuk memeriksa apakah string merupakan angka.
+	 * @param s : String yg akan diperiksa
+	 * @param radix : Basis nomor (10) 
+	 * @return true jika tidak ada huruf dalam string
+	 */
 	private static boolean isInteger(String s, int radix) {
 		
 		if(s.isEmpty()) return false;

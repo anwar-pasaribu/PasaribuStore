@@ -37,7 +37,11 @@ public class AppsController extends Application {
 	private List<Supplier> list_supplier = new ArrayList<Supplier>();
 	private List<Brand> list_brand = new ArrayList<Brand>();
 	private List<String> list_product_category = new ArrayList<String>();
+	private List<Abjad> listHuruf = new ArrayList<Abjad>();
 	
+	//Var ini berfungsi untuk mendeteksi apakah parsing sudah pernah dilakukan
+	//Asumsi pertama boleh dilakukan, utk Home.java
+	public boolean isExecuted = true;
 	
 	/* From androidhive.com -start- */
 	@Override
@@ -112,6 +116,9 @@ public class AppsController extends Application {
 		barang_data_full.set(location, new_data_barang);
 	}
 	
+	/**
+	 * @return Seluruh List Barang Lengkap
+	 */
 	public List<Barang> getAllBarangList() {
 		return barang_data_full;
 	}	
@@ -132,14 +139,77 @@ public class AppsController extends Application {
 	}
 	
 	/**
-	 * Berfungsi utk mengolah JSONObject Barang menjadi var Barang.
-	 * @param jsonObject - String dengan format JSON dari Server
-	 * @return Barang - Bentuk barang full version (table barang)
+	 * Mendapatkan posisi barang/ index barang dalam List &lt;Barang&gt;
+	 * @param nama_barang : nama yang akan di cari posisi indexnya.
+	 * @return posisi barang dalam list (index).
 	 */
-	public Barang createBarangFromJSONObject(JSONObject jsonObject) {
+	public int getBarangListIndexByName(String nama_barang) {
 		
+		int index_category_list = 0;
+		
+		for(int i = 0; i < getBarangArrayListSize(); i++) {
+			if(getAllBarangList().get(i).getNama_barang().equals(nama_barang) || getAllBarangList().get(i).getNama_barang().matches(nama_barang) ) {
+				index_category_list = i;
+				break;
+				
+			}
+		}
+		
+		return index_category_list;
+		
+	}
+	
+	/**
+	 * Berfungsi utk mengolah <b>JSONObject</b> Barang menjadi var Barang.
+	 * @param jsonObject - String dengan format JSON dari Server
+	 * @return Barang - Bentuk barang full version (table barang) 
+	 * @author Anwar Pasaribu
+	 * 
+	 */
+	public Barang createBarangFromJSONObject(JSONObject jsonObject) {		
+		String huruf_pertama = "";		
 		Barang data_barang_temp = null;
+		
 		try {
+			
+			huruf_pertama = jsonObject.getString(Barang.NAMA_BARANG).substring(0, 1);
+			
+			if(listHuruf.isEmpty()) {				
+				listHuruf.add(new Abjad(huruf_pertama, 1));				
+				addToListBarang(new Barang(huruf_pertama, 1));
+				
+			} else {
+				
+				for(int i = 0; i < listHuruf.size();) {
+					
+					if(!isCharPresentOnListHuruf(huruf_pertama) ) {
+						
+						listHuruf.add(new Abjad(huruf_pertama, 1));
+						addToListBarang(new Barang(huruf_pertama, 1));
+						break;
+						
+					} else {
+						
+						int index_hurufDalamList = getListHurufIndexByCharacter(huruf_pertama);
+						
+						int jml_huruf = listHuruf.get(index_hurufDalamList).getJumlah();
+						listHuruf.set(index_hurufDalamList, new Abjad(huruf_pertama, jml_huruf+1));
+						
+						String huruf  = listHuruf.get(index_hurufDalamList).getHuruf();
+						int char_num = listHuruf.get(index_hurufDalamList).getJumlah();
+						
+						int indexHurufDalamListBarang = getBarangListIndexByName(huruf_pertama);
+						
+						getAllBarangList().set( indexHurufDalamListBarang, new Barang(huruf, char_num) );
+						
+						break;
+					}
+					
+					
+				}
+				
+			}
+			
 			data_barang_temp = new Barang(
 					jsonObject.getInt(Barang.ID_BARANG), 
 					jsonObject.getInt(Barang.ID_MEREK), 
@@ -156,6 +226,7 @@ public class AppsController extends Application {
 					jsonObject.getString(Barang.DESKRIPSI_BARANG), 
 					jsonObject.getInt(Barang.FAVORITE) 
 					);
+			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}	
@@ -163,9 +234,22 @@ public class AppsController extends Application {
 		return data_barang_temp;
 		
 	}
+	
 
-	public void addToListBarangFull(Barang barang) {
+	/**
+	 * Memasukkan satu object Barang
+	 * @param barang
+	 */
+	public void addToListBarang(Barang barang) {
 		barang_data_full.add(barang);
+	}
+	
+	/**
+	 * Memasukkan list data Barang. <b> Bukan Object Barang </b>
+	 * @param barang
+	 */
+	public void addToListBarangFull(List<Barang> listBarang) {
+		barang_data_full = listBarang;
 	}
 	
 	public int getBarangArrayListSize() {
@@ -177,11 +261,79 @@ public class AppsController extends Application {
 	 */
 	public void clearAllBarangList() {
 		barang_data_full.clear();
-	}
-	
-	/////////////////////////////////////////////////////////////////
+	}	
 	/////////////////////////BARANG-END//////////////////////////////
 	
+	////////////////////////////////////////////////////////////////
+	///////////////////////HURUF-HEADER/////////////////////////////	
+	
+	
+	/**
+	 * Kelas utk menampung data huruf abjad dan berapa banyak data per huruf.
+	 * @author Anwar Pasaribu
+	 * @version 1.0
+	 */
+	class Abjad{
+		private String huruf;
+		private int jumlah;
+		
+		public Abjad(String huruf, int jumlah) {
+			super();
+			this.setHuruf(huruf);
+			this.setJumlah(jumlah);
+		}
+		
+		public String getHuruf() {
+			return huruf;
+		}
+		
+		public void setHuruf(String huruf) {
+			this.huruf = huruf;
+		}
+		
+		public int getJumlah() {
+			return jumlah;
+		}
+		
+		public void setJumlah(int jumlah) {
+			this.jumlah = jumlah;
+		}
+		
+		
+	}
+	
+	public int getSize_listHuruf() {
+		return listHuruf.size();
+	}
+	
+	/**
+	 * Menemukan indeks huruf dalam list
+	 * @param character
+	 * @return int (index)
+	 */
+	public int getListHurufIndexByCharacter(String character) {
+		
+		for(int i = 0; i < listHuruf.size(); i++) {
+			if(listHuruf.get(i).getHuruf().equals(character)) {
+				return i;
+			}
+		}
+		
+		return 0;
+		
+	}
+	
+	public boolean isCharPresentOnListHuruf(String character) {
+		
+		for(int i = 0; i < listHuruf.size(); i++) {
+			if(listHuruf.get(i).getHuruf().equals(character)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	///////////////////////HURUF-HEADER-END////////////////////////
 	
 	////////////////////////////////////////////////////////////////
 	///////////////////////SUPPLIER/////////////////////////////////

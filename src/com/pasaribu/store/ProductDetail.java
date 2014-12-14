@@ -56,7 +56,7 @@ public class ProductDetail extends Activity {
 		initilizeTextView();
 		
 		id_barang 			= getIntent().getExtras().getInt(Barang.ID_BARANG);
-		list_barang_index 	= getIntent().getExtras().getInt("list_barang_index");		
+		list_barang_index 	= getIntent().getExtras().getInt("list_barang_index");	//List ini berfungsi utk set Data List (UPDATE)	
 		
 		//Isi data barang ke TextView
 		populateTextViewData(id_barang, list_barang_index);
@@ -139,6 +139,7 @@ public class ProductDetail extends Activity {
 					
 					JSONObject jsonObject = jArray_dataBarang.getJSONObject(i);
 					
+					//Mengubah data Barang di aController
 					aController.setBarangAtPosition(list_barang_index, 
 													aController.createBarangFromJSONObject(jsonObject));					
 				}

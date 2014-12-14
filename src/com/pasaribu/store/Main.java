@@ -150,8 +150,6 @@ public class Main extends FragmentActivity {
     
     
 
-    //MEMBUAT OPTION
-    //dari xml item
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
@@ -166,14 +164,14 @@ public class Main extends FragmentActivity {
 		switch (id) {
 		case R.id.option_add_barang:
 			
-			//TODO Membuka activity AddDataBarang tanpa data yang dikirimkan
+			//Membuka activity AddDataBarang tanpa data yang dikirimkan
 			Intent i = new Intent(getBaseContext(), AddDataBarang.class);
 			startActivity(i);
 			
 			break;
 		case R.id.option_setting:
 			
-			//TODO Membuka activity AddDataBarang tanpa data yang dikirimkan
+			//Membuka activity AddDataBarang tanpa data yang dikirimkan
 			Intent intent_setting = new Intent(getBaseContext(), Setting.class);
 			startActivity(intent_setting);
 

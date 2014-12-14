@@ -15,28 +15,40 @@ public class Barang {
 					lokasi_barang,
 					kategori_barang,
 					deskripsi_barang;
-	private int 	favorite;
+	private int 	id_favorite;
+	
+	private transient boolean isGroupHeader = false;
 	
 	
 	//FIELD DATABASE UTK TABLE BARANG
-	public static String ID_BARANG = "id_barang";
-	public static String ID_USER = "id_user";
-	public static String ID_MEREK = "id_merek";
-	public static String ID_PENJUAL = "id_penjual";
-	public static String ID_GAMBAR = "id_gambar";
-	public static String NAMA_BARANG = "nama_barang";
-	public static String STOK_BARANG = "stok_barang";
-	public static String SATUAN_BARANG = "satuan_barang";
-	public static String HARGA_BARANG = "harga_barang";
-	public static String TGL_HARGA_STOK_BARANG = "tgl_harga_stok_barang";
-	public static String KODE_BARANG = "kode_barang";
-	public static String LOKASI_BARANG = "lokasi_barang";
-	public static String KATEGORI_BARANG = "kategori_barang";
-	public static String DESKRIPSI_BARANG = "deskripsi_barang";
-	public static String FAVORITE = "id_favorite";
+	public static transient String ID_BARANG = "id_barang";
+	public static transient String ID_USER = "id_user";
+	public static transient String ID_MEREK = "id_merek";
+	public static transient String ID_PENJUAL = "id_penjual";
+	public static transient String ID_GAMBAR = "id_gambar";
+	public static transient String NAMA_BARANG = "nama_barang";
+	public static transient String STOK_BARANG = "stok_barang";
+	public static transient String SATUAN_BARANG = "satuan_barang";
+	public static transient String HARGA_BARANG = "harga_barang";
+	public static transient String TGL_HARGA_STOK_BARANG = "tgl_harga_stok_barang";
+	public static transient String KODE_BARANG = "kode_barang";
+	public static transient String LOKASI_BARANG = "lokasi_barang";
+	public static transient String KATEGORI_BARANG = "kategori_barang";
+	public static transient String DESKRIPSI_BARANG = "deskripsi_barang";
+	public static transient String FAVORITE = "id_favorite";
 	
-	
-	
+	public Barang(String huruf, int jumlah) {
+		this(0, 0, 0, 0, huruf, jumlah, "", 0, "", "","","","", 0);
+		setGroupHeader(true);
+	}
+
+	public boolean isGroupHeader() {
+		return isGroupHeader;
+	}
+
+	public void setGroupHeader(boolean isGroupHeader) {
+		this.isGroupHeader = isGroupHeader;
+	}
 
 	public Barang(int id_barang, int id_merek, int id_penjual, int id_gambar,
 			String nama_barang, int stok_barang, String satuan_barang,
@@ -57,7 +69,7 @@ public class Barang {
 		this.lokasi_barang = lokasi_barang;
 		this.kategori_barang = kategori_barang;
 		this.deskripsi_barang = deskripsi_barang;
-		this.favorite = favorite;
+		this.id_favorite = favorite;
 	}
 
 
@@ -246,14 +258,14 @@ public class Barang {
 
 
 	public int getFavorite() {
-		return favorite;
+		return id_favorite;
 	}
 
 
 
 
 	public void setFavorite(int favorite) {
-		this.favorite = favorite;
+		this.id_favorite = favorite;
 	}
 
 

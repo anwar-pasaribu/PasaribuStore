@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:background="#E9E9E9"
+    android:orientation="vertical"
+    tools:ignore="RtlHardcoded" >
+
+    <TextView
+        android:id="@+id/textView_header_list_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/margin_8dp"
+        android:text="Judul Pembagi List"
+        android:textStyle="bold"
+        tools:ignore="RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/textView_header_list_num"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/margin_8dp"
+        android:gravity="center"
+        android:text="100"
+        android:textSize="14sp" />
+
+    <View
+        android:id="@+id/view_line_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="#E9E9E9" />
+
+</RelativeLayout>

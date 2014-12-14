@@ -1,5 +1,6 @@
 package com.pasaribu.store.view;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,17 +43,17 @@ public class CustomListHome
 	private Context 		context;
 	private List<Barang>	dataBarangHome;
 	private String tag_delete_barang = "tag_delete_single_product";	
-	private final static int ROW_LAYOUT = R.layout.list_item_home;
+	private final static int ROW_ITEM_LAYOUT = R.layout.list_item_home;
+	private final static int ROW_HEADER_LAYOUT = R.layout.list_header;
 	private CustomListHomeListener custListHomeListener;
 	
-	private int position = 0;
-	
+	private int position = 0;	
 	
 	public CustomListHome(Context context, List<Barang> data) {
-		super(context, ROW_LAYOUT, data);
+		super(context, ROW_ITEM_LAYOUT, data);
 		this.context = context;
-		this.dataBarangHome = data;
-		
+		this.dataBarangHome = new ArrayList<Barang>();
+		this.dataBarangHome.addAll(data); 	//New version 12/12/14
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -67,7 +68,9 @@ public class CustomListHome
 	}
 	///////////////////////////////////////////////////////////////////////
 	
-	
+	public void add(Barang barang) {
+		this.dataBarangHome.add(barang);
+	}
 
 	@Override
 	public int getCount() {
@@ -93,16 +96,16 @@ public class CustomListHome
 		this.position = position;	
 		String text_product_stock_price = "";
 		
-		View 			itemView = convertView;
+		View 			itemView = null;
 		LayoutInflater 	inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		ViewHolder 		holder;
 		
 		Barang dataAktif = dataBarangHome.get(position);
 		
-		if(itemView == null) {
-			
-			holder = new ViewHolder();
-			itemView = inflater.inflate(ROW_LAYOUT, parent, false);			
+		holder = new ViewHolder();
+		
+		if(!dataAktif.isGroupHeader()) {
+			itemView = inflater.inflate(ROW_ITEM_LAYOUT, parent, false);			
 		
 			holder.text_product_name = (TextView) itemView.findViewById(R.id.text_product_name); 
 			holder.text_product_price = (TextView) itemView.findViewById(R.id.text_product_price);
@@ -114,46 +117,53 @@ public class CustomListHome
 			
 			holder.btn_more_option = (ImageButton) itemView.findViewById(R.id.btn_more_option); //Over flow button
 			
+			//Format teks utk text_product_stock_date TextView | 6 Unit - 15 Nov
+			text_product_stock_price = 	dataAktif.getStok_barang() 
+										+ " " + dataAktif.getSatuan_barang() 
+										+ " - " + Helper.getIndonesianDate(dataAktif.getTgl_stok_barang()); //TODO Buat fungsi pengubah tgl MySQL ke format indonesia
+					
+			holder.text_product_name.setText(dataAktif.getNama_barang());
+			holder.text_product_price.setText("Rp " + dataAktif.getHarga_barang());
+			holder.text_product_stock_date.setText( text_product_stock_price );
+			holder.text_product_category.setText(dataAktif.getKategori_barang());
+			
+			//Membuat tag imageButton berisi informasi data barang
+			holder.btn_more_option.setTag(dataAktif);
+			holder.btn_more_option.setTag(R.id.btn_more_option, position);
+			
+			//Menghilangkan fokus saat list di load
+			holder.btn_more_option.setFocusable(false);
+			holder.btn_more_option.setFocusableInTouchMode(false);
+			//Memberikan click listener pada tombol
+			holder.btn_more_option.setOnClickListener(this);
+			
+			//Pengaturan utk image_product dan image_status_favorite
+			//TODO Gunakan metode async atau libary third party utk loading gambar
+			//Utk sementara image_product biarkan gambar asli dulu
+			//////////////////////////////////////////////////////////////////////
+			
+			//Proses utk image_status_favorite, ditampilkan atau tidak
+			if(dataAktif.getFavorite() == 0) {
+				holder.image_status_favorite.setVisibility(View.INVISIBLE);
+			} else {
+				holder.image_status_favorite.setVisibility(View.VISIBLE);
+			}
 			
 			itemView.setTag(holder);
 			
 		} else {
-			holder = (ViewHolder) itemView.getTag();
+			
+			
+			itemView = inflater.inflate(ROW_HEADER_LAYOUT, parent, false);
+			holder.header_title = (TextView) itemView.findViewById(R.id.textView_header_list_title);
+			holder.header_list_num = (TextView) itemView.findViewById(R.id.textView_header_list_num);
+			
+			holder.header_title.setText(dataAktif.getNama_barang());
+			holder.header_list_num.setText(dataAktif.getStok_barang()+" ");
+			
+			itemView.setTag(holder);
+			
 		}
-		
-		
-		
-		//Format teks utk text_product_stock_date TextView
-		text_product_stock_price = 	dataAktif.getStok_barang() 
-									+ " " + dataAktif.getSatuan_barang() 
-									+ " - " + Helper.getIndonesianDate(dataAktif.getTgl_stok_barang()); //TODO Buat fungsi pengubah tgl MySQL ke format indonesia
-				
-		holder.text_product_name.setText(dataAktif.getNama_barang());
-		holder.text_product_price.setText("Rp " + dataAktif.getHarga_barang());
-		holder.text_product_stock_date.setText( text_product_stock_price );
-		holder.text_product_category.setText(dataAktif.getKategori_barang());
-		
-		//Membuat tag imageButton berisi informasi data barang
-		holder.btn_more_option.setTag(dataAktif);
-		
-		//Menghilangkan fokus saat list di load
-		holder.btn_more_option.setFocusable(false);
-		holder.btn_more_option.setFocusableInTouchMode(false);
-		//Memberikan click listener pada tombol
-		holder.btn_more_option.setOnClickListener(this);
-		
-		//Pengaturan utk image_product dan image_status_favorite
-		//TODO Gunakan metode async atau libary third party utk loading gambar
-		//Utk sementara image_product biarkan gambar asli dulu
-		//////////////////////////////////////////////////////////////////////
-		
-		//Proses utk image_status_favorite, ditampilkan atau tidak
-		if(dataAktif.getFavorite() == 0) {
-			holder.image_status_favorite.setVisibility(View.INVISIBLE);
-		} else {
-			holder.image_status_favorite.setVisibility(View.VISIBLE);
-		}
-		
 		
 		return itemView;
 	}
@@ -162,8 +172,9 @@ public class CustomListHome
 	//apabila list sudah besar
 	private static class ViewHolder {
 		
-		//Layout View Item
-		//protected LinearLayout layout_item_home;
+		//Widget  utk header
+		protected TextView  header_title,
+							header_list_num;
 		
 		protected TextView 	text_product_name,
 							text_product_price,
@@ -181,6 +192,9 @@ public class CustomListHome
 		
 		switch (v.getId()) {
 		case R.id.btn_more_option:
+			//Jika tombol yg ditekan tombol overflow
+			final int item_position = (int) v.getTag(R.id.btn_more_option);
+			Log.i(TAG, "Positon on overflow button : " + item_position);
 			
 			PopupMenu popup_overflow = new PopupMenu(getContext(), v);
 			popup_overflow.getMenuInflater().inflate(R.menu.overflow_home_list, popup_overflow.getMenu());
@@ -198,7 +212,7 @@ public class CustomListHome
 						
 						Intent intentEditDataBarang = new Intent(context, EditDataBarang.class);
 						intentEditDataBarang.putExtra(Barang.ID_BARANG, id_barang);
-						intentEditDataBarang.putExtra("list_barang_index", position);
+						intentEditDataBarang.putExtra("list_barang_index", item_position);
 						context.startActivity(intentEditDataBarang);
 						
 						break;

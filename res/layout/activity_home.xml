@@ -2,9 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:baselineAligned="false"    
-     >
+    android:baselineAligned="false"
+    android:orientation="horizontal" >
 
     <LinearLayout
         android:id="@+id/left_pane"
@@ -14,8 +13,8 @@
         android:orientation="vertical" >
 
         <TextView
-           style="@android:style/TextAppearance.DeviceDefault.Medium"
             android:id="@+id/title_left_pane"
+            style="@android:style/TextAppearance.DeviceDefault.Medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_16dp"
@@ -25,10 +24,8 @@
         <ListView
             android:id="@+id/list_recently"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-             >
+            android:layout_height="match_parent" >
         </ListView>
-
     </LinearLayout>
 
     <LinearLayout
@@ -37,15 +34,13 @@
         android:layout_height="match_parent"
         android:layout_weight="5"
         android:background="@android:color/background_light"
-        android:orientation="vertical"
-         >
+        android:orientation="vertical" >
 
         <ListView
             android:id="@+id/list_home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-             >
-
+            >
         </ListView>
 
     </LinearLayout>
