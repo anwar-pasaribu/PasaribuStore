@@ -1,4 +1,8 @@
-package com.pasaribu.store;
+package com.pasaribu.store.adapter;
+
+import com.pasaribu.store.Favorite;
+import com.pasaribu.store.Home;
+import com.pasaribu.store.Shopping;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

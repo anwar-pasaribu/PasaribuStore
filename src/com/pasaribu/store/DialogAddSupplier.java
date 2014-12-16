@@ -2,6 +2,7 @@ package com.pasaribu.store;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,7 +13,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import com.pasaribu.store.model_data.AppsConstanta;
+
+import com.pasaribu.store.data_model.AppsConstanta;
 
 public class DialogAddSupplier extends DialogFragment {
 	

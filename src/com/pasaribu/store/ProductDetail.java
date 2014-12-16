@@ -16,8 +16,8 @@ import android.widget.Toast;
 
 import com.pasaribu.store.control.AppsController;
 import com.pasaribu.store.control.GetCloudData;
-import com.pasaribu.store.model_data.AppsConstanta;
-import com.pasaribu.store.model_data.Barang;
+import com.pasaribu.store.data_model.AppsConstanta;
+import com.pasaribu.store.data_model.Barang;
 
 /**
  * ProductDetail.java berguna untuk menampilkan data lengkap (semua informasi).

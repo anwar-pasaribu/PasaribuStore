@@ -35,12 +35,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.pasaribu.store.control.AppsController;
-import com.pasaribu.store.control.CustonJsonObjectRequest;
 import com.pasaribu.store.control.Helper;
-import com.pasaribu.store.model_data.AppsConstanta;
-import com.pasaribu.store.model_data.Barang;
-import com.pasaribu.store.model_data.Brand;
-import com.pasaribu.store.model_data.Supplier;
+import com.pasaribu.store.data_model.AppsConstanta;
+import com.pasaribu.store.data_model.Barang;
+import com.pasaribu.store.data_model.Brand;
+import com.pasaribu.store.data_model.Supplier;
+import com.pasaribu.store.volley.CustonJsonObjectRequest;
 
 public class AddDataBarang extends Activity 
 	implements 	OnItemSelectedListener, 

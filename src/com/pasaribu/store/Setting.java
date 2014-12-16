@@ -1,7 +1,7 @@
 package com.pasaribu.store;
 
 import com.pasaribu.store.control.AppsController;
-import com.pasaribu.store.model_data.AppsConstanta;
+import com.pasaribu.store.data_model.AppsConstanta;
 
 import android.app.Activity;
 import android.os.Bundle;

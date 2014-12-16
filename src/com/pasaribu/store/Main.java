@@ -10,7 +10,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.pasaribu.store.view.DisplayGui;
+import com.pasaribu.store.adapter.DisplayGui;
+import com.pasaribu.store.adapter.TabPagerAdapter;
 
 public class Main extends FragmentActivity {
 	

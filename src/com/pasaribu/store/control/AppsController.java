@@ -16,9 +16,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-import com.pasaribu.store.model_data.Barang;
-import com.pasaribu.store.model_data.Brand;
-import com.pasaribu.store.model_data.Supplier;
+import com.pasaribu.store.data_model.Barang;
+import com.pasaribu.store.data_model.Brand;
+import com.pasaribu.store.data_model.Supplier;
+import com.pasaribu.store.volley.LruBitmapCache;
 
 /**
  * @author Anwar Pasaribu

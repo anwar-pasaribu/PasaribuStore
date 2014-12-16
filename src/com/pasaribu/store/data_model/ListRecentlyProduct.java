@@ -1,4 +1,4 @@
-package com.pasaribu.store.model_data;
+package com.pasaribu.store.data_model;
 
 public class ListRecentlyProduct {
 

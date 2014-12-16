@@ -11,6 +11,7 @@ import com.android.volley.Request.Priority;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
+import com.pasaribu.store.volley.CustonJsonObjectRequest;
 
 /**
  * Kelas ini berfungsi untuk mengambil JSONObject dari database MySQL.

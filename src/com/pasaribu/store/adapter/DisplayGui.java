@@ -1,4 +1,4 @@
-package com.pasaribu.store.view;
+package com.pasaribu.store.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;

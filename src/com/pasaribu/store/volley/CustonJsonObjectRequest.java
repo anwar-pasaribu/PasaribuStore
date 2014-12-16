@@ -1,4 +1,4 @@
-package com.pasaribu.store.control;
+package com.pasaribu.store.volley;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
