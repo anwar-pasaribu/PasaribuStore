@@ -20,7 +20,7 @@
         android:src="@drawable/ic_launcher" />
 
     <TextView
-        android:id="@+id/text_product_name"
+        android:id="@+id/text_supplierName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/margin_8dp"
@@ -38,9 +38,9 @@
         android:id="@+id/text_product_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/text_product_name"
-        android:layout_alignStart="@+id/text_product_name"
-        android:layout_below="@+id/text_product_name"
+        android:layout_alignLeft="@+id/text_supplierName"
+        android:layout_alignStart="@+id/text_supplierName"
+        android:layout_below="@+id/text_supplierName"
         android:layout_marginTop="@dimen/margin_4dp"
         android:text="Rp 45 000,"
         android:textAppearance="?android:attr/textAppearanceSmall" />
