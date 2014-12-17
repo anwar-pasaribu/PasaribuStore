@@ -51,6 +51,7 @@ public class CustomListHome
 	
 	public CustomListHome(Context context, List<Barang> data) {
 		super(context, ROW_ITEM_LAYOUT, data);
+		
 		this.context = context;
 		this.dataBarangHome = new ArrayList<Barang>();
 		this.dataBarangHome.addAll(data); 	//New version 12/12/14
@@ -107,7 +108,7 @@ public class CustomListHome
 		if(!dataAktif.isGroupHeader()) {
 			itemView = inflater.inflate(ROW_ITEM_LAYOUT, parent, false);			
 		
-			holder.text_product_name = (TextView) itemView.findViewById(R.id.text_product_name); 
+			holder.text_product_name = (TextView) itemView.findViewById(R.id.text_supplierName); 
 			holder.text_product_price = (TextView) itemView.findViewById(R.id.text_product_price);
 			holder.text_product_stock_date = (TextView) itemView.findViewById(R.id.text_product_stock_date);
 			holder.text_product_category = (TextView) itemView.findViewById(R.id.text_product_category);
