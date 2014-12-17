@@ -35,7 +35,7 @@ public class AppsController extends Application {
 	//Me create this, List yang akan menampung seluruh data
 	private Context mainContext;	
 	private List<Barang> barang_data_full = new ArrayList<Barang>();
-	private List<Supplier> list_supplier = new ArrayList<Supplier>();
+	private ArrayList<Supplier> list_supplier = new ArrayList<Supplier>();
 	private List<Brand> list_brand = new ArrayList<Brand>();
 	private List<String> list_product_category = new ArrayList<String>();
 	private List<Abjad> listHuruf = new ArrayList<Abjad>();
@@ -168,48 +168,48 @@ public class AppsController extends Application {
 	 * 
 	 */
 	public Barang createBarangFromJSONObject(JSONObject jsonObject) {		
-		String huruf_pertama = "";		
+//		String huruf_pertama = "";		
 		Barang data_barang_temp = null;
 		
 		try {
-			
-			huruf_pertama = jsonObject.getString(Barang.NAMA_BARANG).substring(0, 1);
-			
-			if(listHuruf.isEmpty()) {				
-				listHuruf.add(new Abjad(huruf_pertama, 1));				
-				addToListBarang(new Barang(huruf_pertama, 1));
-				
-			} else {
-				
-				for(int i = 0; i < listHuruf.size();) {
-					
-					if(!isCharPresentOnListHuruf(huruf_pertama) ) {
-						
-						listHuruf.add(new Abjad(huruf_pertama, 1));
-						addToListBarang(new Barang(huruf_pertama, 1));
-						break;
-						
-					} else {
-						
-						int index_hurufDalamList = getListHurufIndexByCharacter(huruf_pertama);
-						
-						int jml_huruf = listHuruf.get(index_hurufDalamList).getJumlah();
-						listHuruf.set(index_hurufDalamList, new Abjad(huruf_pertama, jml_huruf+1));
-						
-						String huruf  = listHuruf.get(index_hurufDalamList).getHuruf();
-						int char_num = listHuruf.get(index_hurufDalamList).getJumlah();
-						
-						int indexHurufDalamListBarang = getBarangListIndexByName(huruf_pertama);
-						
-						getAllBarangList().set( indexHurufDalamListBarang, new Barang(huruf, char_num) );
-						
-						break;
-					}
-					
-					
-				}
-				
-			}
+//			
+//			huruf_pertama = jsonObject.getString(Barang.NAMA_BARANG).substring(0, 1);
+//			
+//			if(listHuruf.isEmpty()) {				
+//				listHuruf.add(new Abjad(huruf_pertama, 1));				
+//				addToListBarang(new Barang(huruf_pertama, 1));
+//				
+//			} else {
+//				
+//				for(int i = 0; i < listHuruf.size();) {
+//					
+//					if(!isCharPresentOnListHuruf(huruf_pertama) ) {
+//						
+//						listHuruf.add(new Abjad(huruf_pertama, 1));
+//						addToListBarang(new Barang(huruf_pertama, 1));
+//						break;
+//						
+//					} else {
+//						
+//						int index_hurufDalamList = getListHurufIndexByCharacter(huruf_pertama);
+//						
+//						int jml_huruf = listHuruf.get(index_hurufDalamList).getJumlah();
+//						listHuruf.set(index_hurufDalamList, new Abjad(huruf_pertama, jml_huruf+1));
+//						
+//						String huruf  = listHuruf.get(index_hurufDalamList).getHuruf();
+//						int char_num = listHuruf.get(index_hurufDalamList).getJumlah();
+//						
+//						int indexHurufDalamListBarang = getBarangListIndexByName(huruf_pertama);
+//						
+//						getAllBarangList().set( indexHurufDalamListBarang, new Barang(huruf, char_num) );
+//						
+//						break;
+//					}
+//					
+//					
+//				}
+//				
+//			}
 			
 			data_barang_temp = new Barang(
 					jsonObject.getInt(Barang.ID_BARANG), 
@@ -339,7 +339,11 @@ public class AppsController extends Application {
 	////////////////////////////////////////////////////////////////
 	///////////////////////SUPPLIER/////////////////////////////////
 	
-	public List<Supplier> getList_supplier() {
+	/**
+	 * Mengambil seluruh data supplier.
+	 * @return List &lt;Supplier&gt;
+	 */
+	public ArrayList<Supplier> getList_supplier() {
 		return list_supplier;
 	}
 
