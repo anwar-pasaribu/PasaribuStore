@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <color name="orange_ios">#FF9500</color>
+    <color name="blue_ios">#1BADF8</color>
+    <color name="green_ios">#63DA38</color>
+    <color name="ungu_ios">#CC73E1</color>
+    
+    <color name="blue_lighter">#4FC3FF</color>
+    <color name="abu_abu_lighter">#A6A6A6</color>
+    <color name="abu_abu_darker">#585858</color>
+    
+</resources>
