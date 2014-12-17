@@ -1,16 +1,9 @@
 package com.pasaribu.store;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -26,36 +19,23 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request.Method;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.google.gson.Gson;
 import com.pasaribu.store.adapter.CustomListHome;
 import com.pasaribu.store.adapter.CustomListHome.CustomListHomeListener;
 import com.pasaribu.store.control.AppsController;
-import com.pasaribu.store.data_model.AppsConstanta;
 import com.pasaribu.store.data_model.Barang;
-import com.pasaribu.store.data_model.Brand;
-import com.pasaribu.store.data_model.Supplier;
-import com.pasaribu.store.volley.CustonJsonObjectRequest;
 
-public class Home extends Fragment implements CustomListHomeListener{
-	
-	private ArrayList<Barang> barang_data_full = new ArrayList<Barang>();;
+public class Home extends Fragment implements CustomListHomeListener{	
 	
 	protected static final String TAG = Home.class.getSimpleName();
-	private ProgressDialog pDialog;
 	
-	private String tag_json_obj = "jobj_data_home_req";		
+	private ArrayList<Barang> barang_data_full = new ArrayList<Barang>();;
 	private ListView list_home, list_recently;	
 	private CustomListHome adapterListHome;	
 	private AppsController aController;
-	private CustonJsonObjectRequest dataBarang_jsonObjReq;
 	
+	//Keperluan paginating list
 	int start_from = 0;
 	int limit = 10;
 	boolean loadingMore = false ;
@@ -66,23 +46,19 @@ public class Home extends Fragment implements CustomListHomeListener{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		Log.i(TAG, "onCreateView");
+		Log.i(TAG, "onCreateView Home");
 		
-		viewHome = inflater.inflate(R.layout.activity_home, container, false);
-		
-		//Inisialisasi Progress Dialog Box
-		pDialog = new ProgressDialog(getActivity());
-		pDialog.setMessage("Loading...");
-		pDialog.setCancelable(false);
+		viewHome = inflater.inflate(R.layout.activity_home, container, false);		
 		
 		//Application Controller, berisi data ter-share utk semua activity.
 		aController = (AppsController) getActivity().getApplicationContext();		
 		
 		//List Home inisialization
 		list_home = (ListView) viewHome.findViewById(R.id.list_home);
-		//barang_data_full.add(new Barang("Data Pertama", 1));
-		adapterListHome = new CustomListHome(getActivity(), barang_data_full);
+		barang_data_full.add(new Barang("Data Pertama", 1));
 		
+		Log.i(TAG, "Barang size : " + aController.getBarangArrayListSize());
+				
 			
 		
 		//Inisialisasi List Recently
@@ -111,316 +87,14 @@ public class Home extends Fragment implements CustomListHomeListener{
 		//Sementara Utk list recently
 		populateRecentlyList();
 		
-		//Mengambil data list_home dari MySQL Database (Online)	
-		if(aController.isNetworkAvailable()) {
-			requestAllDataBarangJSONObject();
-			Log.d(TAG, "requestAllDataBarangJSONObject called");
-		} else {
-			
-			getCacheData();
-			Log.d(TAG, "getCacheData called");
-			
-		}
-		
+				
 		//Untuk mengisi list_home dengan data
-		
+		adapterListHome = new CustomListHome(getActivity(), aController.getAllBarangList());
 		populateListDataBarang();
 		Log.d(TAG, "populateListDataBarang called");
 		
 		return viewHome;
 	}
-	
-
-
-	/**
-	 * Method hanya dilakukan jika ada jaringan internet
-	 */
-	public void requestAllDataBarangJSONObject() {	
-		
-		showProgressDialog();
-		loadingMore = true; //Menyamai tutorial
-		aController.isExecuted = true; //Karena di asumsikan setelah melalui akses jaringan data barang sudah ada pembaruan.
-		
-		Map<String, String> data_request = new HashMap<String, String>();
-		data_request.put("id_user", "1"); //TODO Guna - Asumsikan user aktif dengan id_user = 1
-		data_request.put("start_from", String.valueOf(start_from));
-		data_request.put("limit", String.valueOf(limit));
-		
-		Log.i(TAG, "Data Request : " + data_request.toString());
-		
-		dataBarang_jsonObjReq = new CustonJsonObjectRequest(
-				Method.POST,
-				AppsConstanta.URL_DATA, 
-				data_request, 
-				new Response.Listener<JSONObject>() {
-	
-					@Override
-					public void onResponse(JSONObject response) {
-//						Gson gson = new GsonBuilder().setPrettyPrinting().create();						
-//						Log.i(TAG, "onResponse Listener, Data : " + gson.toJson(response));
-						
-						//Cek Header Data JSON, jika data barang tidak ada
-						if(response.isNull(AppsConstanta.JSON_HEADER_BARANG) 
-								&& response.isNull(AppsConstanta.JSON_HEADER_DATA_SIZE) ) {
-							try {
-								
-								String msg = response.getString(AppsConstanta.JSON_HEADER_MESSAGE);
-								
-								if(msg.equals(AppsConstanta.MESSAGE_SUCCESS)) {
-									msg = "Berhasil, Akses data jaringan berhasil dilakukan.";
-								} else {
-									msg = "Gagal, Akses data jaringan tidak bisa dilakukan.";
-								}
-								
-								Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
-
-							} catch (JSONException e) {
-								e.printStackTrace();
-							}
-							
-						} else {
-																					
-							parseReceivedJSONObject(response);
-						}
-						
-						hideProgressDialog();
-						
-					}
-				}, new Response.ErrorListener() {	
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						VolleyLog.d(TAG, "Error: " + error.toString());
-						Log.e(TAG, "ErrorResponse : " + error.toString());
-						hideProgressDialog();
-						
-					}
-				}){};
-				
-		
-		dataBarang_jsonObjReq.setShouldCache(true);
-		
-		// Lakukan pemeriksaan cache sehingga tidak dilakukan request ke server lagi.		
-		if(AppsController.getInstance().getRequestQueue().getCache().get(AppsConstanta.URL_DATA) != null 
-				&& !aController.isNetworkAvailable()) {
-			
-			getCacheData();
-			
-		} else {
-			Log.i(TAG, "Mengambil data dari jaringan.");
-			AppsController.getInstance().addToRequestQueue(dataBarang_jsonObjReq, tag_json_obj);
-		}
-		
-	}
-
-
-
-
-	/**
-	 * Mengambil data dari cache dan mem-parseny, setelah eksekusi method ini panggil <b>populateListDataBarang()</b>.
-	 * @throws JSONException Pada eksekusi
-	 * 
-	 */
-	private void getCacheData() {
-		
-		if(AppsController.getInstance().getRequestQueue().getCache().get(AppsConstanta.URL_DATA) != null) {
-			
-			Log.i(TAG, "Mengambil data dari cache.");
-			
-			String cachedResponse = new String( AppsController.getInstance().getRequestQueue().getCache().get(AppsConstanta.URL_DATA).data ); 
-			JSONObject cachedJsonObject = null;
-			
-			try {
-				cachedJsonObject = new JSONObject(cachedResponse);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			} finally {
-				cetakSimpleDataBarang("Semua data di cache : ", cachedResponse);
-				aController.isExecuted = true; //utk memastikan bisa ekesekusi jika offline
-				parseReceivedJSONObject(cachedJsonObject);
-			}
-			
-		} else {
-			Log.e(TAG, "Tidak ada data di cache!");
-		}
-		
-		
-		
-	} 	
-	
-	
-	private void cetakSimpleDataBarang(String title, String stringResponse) {
-		JSONObject jsonResponse = null;
-		Log.v(TAG, title);
-		try {
-			jsonResponse = new JSONObject(stringResponse.toString());		
-			JSONArray jArray_dataBarang = null;	
-			jArray_dataBarang = jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BARANG);		
-			
-			for(int i  = 0; i < aController.getAllBarangList().size(); i++) {
-				
-					JSONObject jsonObject = jArray_dataBarang.getJSONObject(i);
-					
-					Log.d(TAG, i + " - Nama : " + jsonObject.getString(Barang.NAMA_BARANG) );
-			}
-		
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
-	}
-
-
-
-
-	private void parseReceivedJSONObject(JSONObject responseJsonObject) {
-		
-		JSONObject responseObject = null;
-		Log.i(TAG,"Parsing data dilakukan, isExecuted : " + String.valueOf(aController.isExecuted));
-		
-    	if (aController.isExecuted) {	
-    		
-			try {
-
-				Gson gson = new Gson();
-				int i = 0; // Mengurangi pengulangan inisalisasi var
-
-				responseObject = new JSONObject(responseJsonObject.toString());
-				JSONArray jArray_dataBarang = responseObject.getJSONArray(AppsConstanta.JSON_HEADER_BARANG);
-				JSONArray jArray_SupplierData = responseObject.getJSONArray(AppsConstanta.JSON_HEADER_SUPPLIER);
-				JSONArray jArray_BrandData = responseObject.getJSONArray(AppsConstanta.JSON_HEADER_BRAND);
-				JSONArray jArray_CategoryData = responseObject.getJSONArray(AppsConstanta.JSON_HEADER_CATEGORY);
-				String query = responseObject.getString("QUERY");
-				
-				int isEndOfData = responseObject.getInt(AppsConstanta.JSON_HEADER_END_OF_DATA);
-
-				int data_barang_size_new = responseObject.getInt(AppsConstanta.JSON_HEADER_DATA_SIZE);
-				
-				Log.v(TAG, "Query, " + query);
-				if(isEndOfData == 1) {
-					Log.w(TAG, "Akhir seluruh data, " + isEndOfData);
-				} else {
-					Log.v(TAG, "Tidak Akhir seluruh data, " + isEndOfData);
-				}
-				
-				//Ukuran barang lokal di kurang dengan banyak header
-				//int data_barang_size_local = aController.getBarangArrayListSize()- aController.getSize_listHuruf(); 
-
-				//TODO: Untuk mengambil data dari JSONArray Barang
-				//data_barang_size_new > 0 && data_barang_size_local != data_barang_size_new
-				if (jArray_dataBarang.length() == 0) {
-
-					showAlertDialog("Data Barang Kosong", "Data barang tidak ada, silahkan restart aplikasi");
-
-				} else {
-					Log.d(TAG, "Jumlah data on parse: " + data_barang_size_new);
-
-					//JSONObject jsonObject = null;	  	
-
-					for (i = 0; i < jArray_dataBarang.length(); i++) {
-
-						start_from++; //untuk memperbarui index data dimulai dari mana
-
-						//jsonObject = jArray_dataBarang.getJSONObject(i);
-						//aController.addToListBarangFull(aController.createBarangFromJSONObject(jsonObject));
-
-						String barangInfo = jArray_dataBarang.getJSONObject(i).toString();
-						Barang barang = gson.fromJson(barangInfo, Barang.class); //Dengan gson, mengubah json menjadi data Barang
-						
-						aController.addToListBarang(barang);
-						barang_data_full.add(barang);
-						adapterListHome.add(barang);
-						
-					}
-					
-					aController.addToListBarangFull(barang_data_full); //Add list data Barang (bukan object Barang)	
-					adapterListHome.notifyDataSetChanged();
-					loadingMore = false;
-					
-
-				}
-
-				//TODO: Untuk mengambil data dari JSONArray Supplier
-				int jArray_SupplierDataLength = jArray_SupplierData.length();
-				if (aController.getList_supplier().size() != jArray_SupplierDataLength) {
-
-					aController.clearAllSupplierList();
-
-					for (i = 0; i < jArray_SupplierDataLength; i++) {
-						JSONObject jsonObject = jArray_SupplierData
-								.getJSONObject(i);
-						aController.setList_supplier(new Supplier(jsonObject
-								.getInt(Supplier.ID_PENJUAL), jsonObject
-								.getString(Supplier.NAMA_PENJUAL), jsonObject
-								.getString(Supplier.NAMA_TOKO), jsonObject
-								.getString(Supplier.ALAMAT_TOKO), jsonObject
-								.getString(Supplier.GEOLOCATION), jsonObject
-								.getString(Supplier.KONTAK_TOKO), jsonObject
-								.getString(Supplier.EMAIL_TOKO)));
-
-					}
-				}
-
-				//TODO: Untuk mengambil data dari JSONArray Brand
-				int jArray_BrandDataLength = jArray_BrandData.length();
-				if (aController.getList_brand().size() != jArray_BrandDataLength) {
-
-					aController.getList_brand().clear();
-
-					for (i = 0; i < jArray_BrandDataLength; i++) {
-						JSONObject jsonObject = jArray_BrandData
-								.getJSONObject(i);
-						aController.setList_brand(new Brand(jsonObject
-								.getInt(Brand.ID_MEREK), jsonObject
-								.getString(Brand.NAMA_MEREK), jsonObject
-								.getString(Brand.LOGO_MEREK), jsonObject
-								.getString(Brand.DESKRIPSI_MEREK)));
-
-					}
-				}
-
-				//TODO: Untuk mengambil data dari JSONArray Category
-				int jArray_CategoryDataLength = jArray_CategoryData.length();
-				if (aController.getList_product_category().size() != jArray_CategoryDataLength) {
-
-					aController.getList_product_category().clear();
-
-					for (i = 0; i < jArray_CategoryDataLength; i++) {
-						JSONObject jsonObject = jArray_CategoryData
-								.getJSONObject(i);
-						aController.setList_product_category(jsonObject
-								.getString("kategori_barang"));
-					}
-				}
-
-				Log.i(TAG, "Ukuran Data Barang : " + data_barang_size_new);
-				Log.i(TAG, "Ukuran Data Supplier jArray : "
-						+ jArray_SupplierDataLength + ", aController : "
-						+ aController.getList_supplier().size());
-				Log.i(TAG, "Ukuran Data Brand jArray : "
-						+ jArray_BrandDataLength + ", aController : "
-						+ aController.getList_brand().size());
-				
-				
-				//Setiap pemanggilan keseluruhan, isExecuted akan di ubah menjadi false jika tidak ada jaringan net.
-				//Untuk membuat parsing hanya dilakukan sekali.
-				aController.isExecuted = false;
-				Log.i(TAG,"Parsing data selesai dilakukan, isExecuted : " + String.valueOf(aController.isExecuted));
-
-			} catch (JSONException e) {
-
-				Log.e(TAG,"Gagal : Tidak dapat mengambil data JSON saat parseJSONObject. Message : " + e.getMessage());
-				e.printStackTrace();
-
-			}
-			
-		} else {
-			Log.w(TAG, "Semua data cache sudah di olah");
-		}
-    	 //End isExecuted check    	
-    	
-    	
-	} 
-	/////END - Parse JSONObject Data Barang///////////////////////////////////////////// 	
 	
 	
 	/**
@@ -482,7 +156,8 @@ public class Home extends Fragment implements CustomListHomeListener{
 						
 						//Aksi ambil database jika ada internet
 						if(aController.isNetworkAvailable())
-							requestAllDataBarangJSONObject();							
+							Log.i(TAG, "Ambil data selanjutnya, karena scroll sudah di akhir list");
+							//requestAllDataBarangJSONObject();							
 							
 					} 
 					
@@ -508,28 +183,6 @@ public class Home extends Fragment implements CustomListHomeListener{
 		} 
 		
 	}
-
-//	private boolean isNullJSONObject(JSONObject response) {
-//		
-//		if(response.isNull(AppsConstanta.JSON_HEADER_BARANG) 
-//				&& response.isNull(AppsConstanta.JSON_HEADER_DATA_SIZE) ) {
-//			try {
-//				
-//				String msg = response.getString(AppsConstanta.JSON_HEADER_MESSAGE);
-//				showAlertDialog("Network Database Error ", 
-//						msg + ", but can't access network database.\nPlease check network connectivity, or please try again");
-//
-//				return false;
-//				
-//			} catch (JSONException e) {
-//				e.printStackTrace();
-//				Log.e(TAG, e.getMessage());
-//			}
-//		} 
-//		
-//		return true;
-//		
-//	}
 	
 
 	private void populateRecentlyList() {		
@@ -572,11 +225,12 @@ public class Home extends Fragment implements CustomListHomeListener{
 	public void deleteDataBarangSuccess(boolean status) {
 		// TODO Lakukan jika proses hapus data berhasil
 		if(status) {
-			requestAllDataBarangJSONObject();
+			//requestAllDataBarangJSONObject();
 			showAlertDialog("Data Berhasil Dihapus", "Data sudah dihapus dari database MySQL.");
 		}
 		
 	}
+	
 	
 	public static String getHostName(String defValue) {
 		try {
@@ -588,14 +242,5 @@ public class Home extends Fragment implements CustomListHomeListener{
 		}
 	}
 
-	private void showProgressDialog() {
-		if (!pDialog.isShowing())
-			pDialog.show();
-	}
-
-	private void hideProgressDialog() {
-		if (pDialog.isShowing())
-			pDialog.hide();
-	}
 	
 }
