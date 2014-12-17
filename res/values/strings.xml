@@ -46,5 +46,6 @@
     <string name="lbl_alamat_ip">Alamat IP</string>
     <string name="hint_ipAddress">Alamat IP Server</string>
     <string name="title_activity_product_detail">Product Detail</string>
+    <string name="title_supplier">Supplier</string>
 
 </resources>

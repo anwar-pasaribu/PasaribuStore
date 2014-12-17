@@ -1,14 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical" >
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    tools:context=".Shopping" >
 
-    <TextView
-        android:id="@+id/title_left_pane"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="50sp"/>
+    <LinearLayout
+        android:id="@+id/left_pane"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/title_left_pane"
+            style="@android:style/TextAppearance.DeviceDefault.Medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_16dp"
+            android:text="@string/title_supplier"
+            android:textSize="@dimen/title_font_size" />
+
+        <ListView
+            android:id="@+id/list_supplier"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:choiceMode="singleChoice"
+             >
+        </ListView>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/content_pane"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="5"
+        android:background="@android:color/background_light"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/btn_addShoppingItem"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="@dimen/margin_8dp"
+            android:text="@string/btn_add" />
+
+        <Button
+            android:id="@+id/btn_cartStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/margin_8dp"
+            android:layout_marginTop="@dimen/margin_8dp"
+            android:text="Selesai" />
+
+        <ListView
+            android:id="@+id/list_shopping"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/btn_addShoppingItem"
+            android:layout_marginTop="@dimen/margin_4dp" >
+
+        </ListView>
+    </RelativeLayout>
 
 </LinearLayout>
