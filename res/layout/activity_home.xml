@@ -21,10 +21,13 @@
             android:text="@string/title_recently"
             android:textSize="@dimen/title_font_size" />
 
+        <!-- Single choice, Update : 17 Des -->
         <ListView
             android:id="@+id/list_recently"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent"
+            android:choiceMode="singleChoice" 
+             >
         </ListView>
     </LinearLayout>
 
