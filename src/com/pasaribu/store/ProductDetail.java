@@ -69,10 +69,10 @@ public class ProductDetail extends Activity {
 		//Periksa apakah ada koneksi jaringan, jika tidak ambil data di aController
 		if(aController.isNetworkAvailable()) {
 			//Ambil data dari MySQL Database
-			
+			Log.i(TAG, "Ambil data dari MySQL Database");
 			//Data yang akan di kirim ke server
 			Map<String, String> dataToSend = new HashMap<String,String>();
-			dataToSend.put(Barang.ID_BARANG, ""+id_barang);
+			dataToSend.put(Barang.ID_BARANG, String.valueOf(id_barang));
 			
 			/* Proses Get Cloud Data
 			* 1. Request Data sesuai URL dan data yg di inginkan.
@@ -84,6 +84,7 @@ public class ProductDetail extends Activity {
 		
 		} else {			
 			//Ambil data dari Application Controller
+			Log.i(TAG, "Ambil data dari Application Controller");
 			setTextViewContents();
 			
 		}
