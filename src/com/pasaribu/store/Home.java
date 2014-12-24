@@ -21,18 +21,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.pasaribu.store.adapter.CustomListHome;
-import com.pasaribu.store.adapter.CustomListHome.CustomListHomeListener;
+import com.pasaribu.store.adapter.ListHomeAdapter;
+import com.pasaribu.store.adapter.ListHomeAdapter.ListHomeAdapterListener;
 import com.pasaribu.store.control.AppsController;
 import com.pasaribu.store.data_model.Barang;
 
-public class Home extends Fragment implements CustomListHomeListener{	
+public class Home extends Fragment implements ListHomeAdapterListener{	
 	
 	protected static final String TAG = Home.class.getSimpleName();
 	
 	private ArrayList<Barang> barang_data_full = new ArrayList<Barang>();;
 	private ListView list_home, list_recently;	
-	private CustomListHome adapterListHome;	
+	private ListHomeAdapter adapterListHome;	
 	private AppsController aController;
 	
 	//Keperluan paginating list
@@ -77,7 +77,7 @@ public class Home extends Fragment implements CustomListHomeListener{
 				if(position == 0 || list_content.matches("Daftar IP")) {
 					//Test tambah data list Home
 					
-					int rand_num = 0 + (int) (Math.random() * ( (100 - 0) + 1) );
+					int rand_num = 0 + (int) (Math.random() * ( (100 - 0) + 1) ); //Men-generate random number 1-100
 					adapterListHome.add(new Barang("Data Added", rand_num));
 					adapterListHome.notifyDataSetChanged();
 				}
@@ -89,7 +89,7 @@ public class Home extends Fragment implements CustomListHomeListener{
 		
 				
 		//Untuk mengisi list_home dengan data
-		adapterListHome = new CustomListHome(getActivity(), aController.getAllBarangList());
+		adapterListHome = new ListHomeAdapter(getActivity(), aController.getAllBarangList());
 		populateListDataBarang();
 		Log.d(TAG, "populateListDataBarang called");
 		
