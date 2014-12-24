@@ -41,7 +41,7 @@ public class Main extends FragmentActivity {
 	private String tag_json_obj = "jobj_data_home_req";	
 	private ProgressDialog pDialog;
 	
-	private ViewPager Tab;
+	private ViewPager viewPagerTab;
     private TabPagerAdapter TabAdapter;
 	private ActionBar actionBar;
 	
@@ -72,7 +72,7 @@ public class Main extends FragmentActivity {
         //TODO Inisialisasi Kelas yang akan digunakan pada main class        
         displayGui = new DisplayGui(this); //Kelas untuk menampilkan GUI pada aplikasi                
         TabAdapter = new TabPagerAdapter(getSupportFragmentManager());        
-        Tab = (ViewPager) findViewById(R.id.main_pager);
+        viewPagerTab = (ViewPager) findViewById(R.id.main_pager);
         
         //Mengambil data list_home dari MySQL Database (Online)	
   		if(aController.isNetworkAvailable()) {
@@ -93,7 +93,8 @@ public class Main extends FragmentActivity {
 	 * 
 	 */
 	private void populateTabPager() {
-		Tab.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+		
+		viewPagerTab.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
                     @Override
                     public void onPageSelected(int position) {
                        
@@ -102,7 +103,8 @@ public class Main extends FragmentActivity {
                     }
                 });
         
-        Tab.setAdapter(TabAdapter);
+        viewPagerTab.setAdapter(TabAdapter);
+        
         
         actionBar = getActionBar();
         
@@ -133,7 +135,7 @@ public class Main extends FragmentActivity {
 			@Override
 			public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
 	          
-	            Tab.setCurrentItem(tab.getPosition());
+	            viewPagerTab.setCurrentItem(tab.getPosition());
 	            
 	            Log.i(TAG, tab.getPosition() + " Position (Selected)");
 	            setTabIconAktif(tab);
@@ -188,7 +190,7 @@ public class Main extends FragmentActivity {
 			
 			
         };
-			
+        
 			android.app.ActionBar.Tab menu_home = actionBar.newTab()
 					.setIcon(R.drawable.action_button_home_normal)
 					.setTabListener(tabListener);
