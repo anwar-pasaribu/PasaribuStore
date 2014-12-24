@@ -3,6 +3,7 @@ package com.pasaribu.store.adapter;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.pasaribu.store.R;
+import com.pasaribu.store.R.color;
 import com.pasaribu.store.data_model.Supplier;
 
 public class SupplierListAdapter 
@@ -38,6 +40,36 @@ public class SupplierListAdapter
 
 
 	@Override
+	public void clear() {
+		data_supplier.clear();
+	}
+
+
+	@Override
+	public void add(Supplier object) {
+		
+		this.data_supplier.add(object);
+		
+	}
+
+
+	@Override
+	public Supplier getItem(int position) {
+		// TODO Auto-generated method stub
+		return super.getItem(position);
+	}
+
+
+
+	@Override
+	public long getItemId(int position) {
+		//Mengirim id penjual pada setiap item di list
+		return data_supplier.get(position).getId_penjual();
+		
+	}
+
+
+	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Log.v(TAG, "Position : " + position);
 		
@@ -59,9 +91,11 @@ public class SupplierListAdapter
 		holder.text_shoppingItemNumber.setText("100 Item");
 		
 		itemView.setTag(holder);
-		
+				
 		return itemView;
 	}
+	
+	
 	
 	private static class ViewHolder {
 		

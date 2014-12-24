@@ -1,7 +1,12 @@
 package com.pasaribu.store;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pasaribu.store.adapter.ListShoppingAdapter;
 import com.pasaribu.store.adapter.SupplierListAdapter;
 import com.pasaribu.store.control.AppsController;
+import com.pasaribu.store.data_model.Barang;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class Shopping extends Fragment {
 	private final String TAG = Shopping.class.getSimpleName();
@@ -25,8 +31,13 @@ public class Shopping extends Fragment {
 	//Application Controller, utk memperoleh data bersama
 	private AppsController aController;
 	
-	//Adapter utk Supplier
-	private SupplierListAdapter supplierListAdapter;
+	//Adapter utk listView
+	private SupplierListAdapter adapterListSupplier;
+	private ListShoppingAdapter adapterListShopping;
+
+	//Data temporer utk list shopping
+	private List<Barang> vShoppingData = new ArrayList<Barang>();
+	private int selectedSupplierId = 0;
 	
 	
 	@Override
@@ -34,6 +45,7 @@ public class Shopping extends Fragment {
             Bundle savedInstanceState) {
 		
 		Log.i(TAG, "onCreateView");
+		
 		//Inflate layout utk dikembalikan ke main activity
 		viewShopping = inflater.inflate(R.layout.activity_shopping, container, false);
         
@@ -43,24 +55,102 @@ public class Shopping extends Fragment {
         //Inisialisasi seluruh widget
 		initilizeWidget();
 		
-		
-		//Mengirm data ke adapter list supplier
-		Log.i(TAG, "Supplier size : " + aController.getList_supplier().size());
-		supplierListAdapter = new SupplierListAdapter(getActivity(), R.layout.list_item_supplier, aController.getList_supplier());
-		
 		//Mengisi data pada listView Supplier
-		pupulateLvSupplier();
+		//Mengirm data ke adapter list supplier
+		adapterListSupplier = new SupplierListAdapter(getActivity(), R.layout.list_item_supplier, aController.getList_supplier());
+		populateLvSupplier();
+		
+		
+		//Mengisi data pada listView Shopping
+		adapterListShopping = new ListShoppingAdapter(getActivity(), vShoppingData);
+		fetchSupplierBasedShoppingItem(getFirstSupplierId());
+		populateLvShopping();
+		
         
         return viewShopping;
 	}
 	
+	
+	private int getFirstSupplierId() {
+		
+		if(aController.getList_supplier().size() > 0)
+			return aController.getList_supplier().get(0).getId_penjual();
+		else
+			return 0;
+		
+	}
+	
+	
+
+
+	/**
+	 * Menampilkan data shopping pada list view
+	 */
+	private void populateLvShopping() {
+		
+		Log.v(TAG, "populateLvShopping, ukuran data shopping : " + vShoppingData.size());
+		
+		if(vShoppingData.size() > 0) {
+			lv_listShopping.setAdapter(adapterListShopping);
+			lv_listShopping.setTextFilterEnabled(true);
+		}
+		
+		
+	}
+	
+
+
+	/**
+	 * Membuat/mengisi data vShoppingData dengan data barang
+	 * berdasarkan toko yang dipilih (Default list pertama).
+	 */
+	private void fetchSupplierBasedShoppingItem(int supplierId) {
+		
+		Log.v(TAG, "fetchSupplierBasedShoppingItem, id : " + supplierId + ", adapter Size : " + vShoppingData.size());		
+		Toast.makeText(getActivity(), "Data " + aController.getSupplierNameById(supplierId), Toast.LENGTH_LONG).show();;
+		
+		int sizeAllBarang = aController.getBarangArrayListSize();
+		
+		if( selectedSupplierId != supplierId &&  sizeAllBarang > 0) {
+			
+			adapterListShopping.clear();;
+			vShoppingData.clear();
+			
+			Log.i(TAG, "adapter count : " + adapterListShopping.getCount() );
+			Log.i(TAG, "shopping data size : " + vShoppingData.size() );
+			
+			if(vShoppingData.size() == 0 && adapterListShopping.isEmpty()) {
+				
+				adapterListShopping.notifyDataSetChanged();
+				
+				for(int i = 0; i <sizeAllBarang; i++) {
+					if(aController.getAllBarangList().get(i).getId_penjual() == supplierId) {					
+						Barang temp_barang = aController.getAllBarangList().get(i);
+						vShoppingData.add(temp_barang);
+						adapterListShopping.add(temp_barang);
+					}
+				}
+				
+			} else {
+				Log.e(TAG, "Data belum dikosongkan");
+			}
+			
+			adapterListShopping.notifyDataSetChanged();
+		}
+		
+		selectedSupplierId = supplierId;
+		
+	}
+	
+
 	/**
 	 * Mengisi data pada ListView Supplier. 
 	 */
-	private void pupulateLvSupplier() {
-		Log.v(TAG, "pupulateLvSupplier");
+	private void populateLvSupplier() {
+		Log.v(TAG, "populateLvSupplier");
+		
 		lv_listSupplier.setSelector(R.drawable.list_secondary_background);
-		lv_listSupplier.setAdapter(supplierListAdapter);
+		lv_listSupplier.setAdapter(adapterListSupplier);
 		lv_listSupplier.setTextFilterEnabled(true);
 		lv_listSupplier.setOnItemClickListener(new OnItemClickListener() {
 
@@ -68,7 +158,9 @@ public class Shopping extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				
-				Log.i(TAG, position + " selected");
+				Log.i(TAG, "Position : " + position + " selected, with id penjual: " + id);
+
+				fetchSupplierBasedShoppingItem((int)id);
 				
 			}
 		});
