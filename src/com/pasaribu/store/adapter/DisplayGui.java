@@ -12,7 +12,7 @@ public class DisplayGui {
 		
 	private Context mainContext;
 	
-	private CustomListHome customListHome;
+	private ListHomeAdapter customListHome;
 	
 	public DisplayGui() {}
 
