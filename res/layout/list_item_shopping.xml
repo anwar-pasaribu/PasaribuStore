@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_item_home"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="HardcodedText" >
+
+    <ImageView
+        android:id="@+id/image_product"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="false"
+        android:layout_marginLeft="@dimen/margin_8dp"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_16dp"
+        android:layout_toEndOf="@+id/image_status_favorite"
+        android:layout_toRightOf="@+id/image_status_favorite"
+        android:contentDescription="@string/image_button_description"
+        android:src="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/text_productName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_8dp"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_16dp"
+        android:layout_toEndOf="@+id/image_product"
+        android:layout_toLeftOf="@+id/imageButton_shoppingStatus"
+        android:layout_toRightOf="@+id/image_product"
+        android:layout_toStartOf="@+id/btn_more_option"
+        android:ellipsize="middle"
+        android:text="Nama Barang yg akan Dibeli"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/text_product_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/text_productName"
+        android:layout_alignStart="@+id/text_productName"
+        android:layout_below="@+id/text_productName"
+        android:layout_marginTop="@dimen/margin_4dp"
+        android:text="Rp 45 000,"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/text_product_stock_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/text_product_price"
+        android:layout_alignBottom="@+id/text_product_price"
+        android:layout_marginStart="@dimen/margin_16dp"
+        android:layout_toEndOf="@+id/text_product_price"
+        android:layout_marginLeft="@dimen/margin_16dp"
+        android:layout_toRightOf="@+id/text_product_price"
+        android:text="140 Kotak - 20 Mei 2014"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ImageButton
+        android:id="@+id/btn_more_option"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/margin_8dp"
+        android:layout_marginEnd="@dimen/margin_8dp"
+        android:layout_marginRight="@dimen/margin_8dp"
+        android:background="@drawable/ic_overflow"
+        android:contentDescription="@string/image_button_description"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:src="@drawable/ic_overflow" />
+
+    <LinearLayout
+        android:id="@+id/layout_product_category_horizontal_scroller"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/text_product_price"
+        android:layout_alignLeft="@+id/text_product_price"
+        android:layout_below="@+id/text_product_price"
+        android:layout_marginTop="@dimen/margin_16dp" >
+
+        <TextView
+            android:id="@+id/text_product_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_8dp"
+            android:text="automotif"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/image_status_favorite"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/margin_16dp"
+        android:layout_marginStart="@dimen/margin_16dp"
+        android:layout_marginTop="@dimen/margin_32dp"
+        android:contentDescription="@string/image_button_description"
+        android:src="@drawable/tag_color_ungu" />
+
+    <ImageButton
+        android:id="@+id/imageButton_shoppingStatus"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="41dp"
+        android:layout_marginEnd="41dp"
+        android:background="@android:color/transparent"
+        android:scaleType="center"
+        android:src="@drawable/button_shopping_status"
+        android:contentDescription="Button" />
+
+</RelativeLayout>
