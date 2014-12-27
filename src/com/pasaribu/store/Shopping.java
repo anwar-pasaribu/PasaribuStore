@@ -43,8 +43,7 @@ public class Shopping extends Fragment {
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-		
-		Log.i(TAG, "onCreateView");
+		Log.i(TAG, "onCreateView Shopping!");
 		
 		//Inflate layout utk dikembalikan ke main activity
 		viewShopping = inflater.inflate(R.layout.activity_shopping, container, false);
