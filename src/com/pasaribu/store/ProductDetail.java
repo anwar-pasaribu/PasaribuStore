@@ -14,10 +14,14 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request.Method;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.pasaribu.store.control.AppsController;
-import com.pasaribu.store.control.GetCloudData;
 import com.pasaribu.store.data_model.AppsConstanta;
 import com.pasaribu.store.data_model.Barang;
+import com.pasaribu.store.volley.CustonJsonObjectRequest;
 
 /**
  * ProductDetail.java berguna untuk menampilkan data lengkap (semua informasi).
@@ -30,7 +34,6 @@ public class ProductDetail extends Activity {
 
 	private final String TAG = ProductDetail.class.getSimpleName();
 	
-	private GetCloudData getCloudData;
 	private AppsController aController;
 	private Barang active_productData;
 	
@@ -41,6 +44,8 @@ public class ProductDetail extends Activity {
 
 	private int id_barang;
 	private int list_barang_index;
+
+	private String volley_tag = "get_product_detail";
 	
 	
 	@Override
@@ -48,9 +53,7 @@ public class ProductDetail extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_product_detail);
 		
-		getCloudData = new GetCloudData();
-		aController = (AppsController) getApplicationContext();
-		
+		aController = (AppsController) getApplicationContext();		
 		
 		//Inisialisasi semua TextView
 		initilizeTextView();
@@ -66,22 +69,15 @@ public class ProductDetail extends Activity {
 	//Berfungsi utk mengisi data dari data barang baik di AppsController atau langsung dari cloud
 	private void populateTextViewData(int id_barang, int list_barang_index) {
 		
+		Log.i(TAG, "id_barang: " + id_barang + ", Indeks Barang:" + list_barang_index);
+		
 		//Periksa apakah ada koneksi jaringan, jika tidak ambil data di aController
 		if(aController.isNetworkAvailable()) {
 			//Ambil data dari MySQL Database
 			Log.i(TAG, "Ambil data dari MySQL Database");
-			//Data yang akan di kirim ke server
-			Map<String, String> dataToSend = new HashMap<String,String>();
-			dataToSend.put(Barang.ID_BARANG, String.valueOf(id_barang));
 			
-			/* Proses Get Cloud Data
-			* 1. Request Data sesuai URL dan data yg di inginkan.
-			* 2. Ambil JSONObject dan olah/parse sesuai kebutuhan.	
-			**/
-			getCloudData.requestJSONObject(AppsConstanta.URL_DATA, dataToSend, "get_product_detail");
-			parseJSONObject(getCloudData.getJsonObject());
+			requestJSONObject();
 			
-		
 		} else {			
 			//Ambil data dari Application Controller
 			Log.i(TAG, "Ambil data dari Application Controller");
@@ -102,12 +98,12 @@ public class ProductDetail extends Activity {
 		String product_brand = aController.getBrandName(active_productData.getId_merek());
 		String store_name = aController.getSupplierNameById(active_productData.getId_penjual());
 		
-		TextView_product_name.setText(active_productData.getNama_barang());
-		TextView_product_brand.setText( product_brand );
+		TextView_product_name.setText("ID: " + active_productData.getId_barang() + " - " + active_productData.getNama_barang());
+		TextView_product_brand.setText("ID: " + active_productData.getId_merek() + " - " + product_brand );
 		TextView_product_price.setText("Rp " + active_productData.getHarga_barang());
 		TextView_product_num_unit.setText(active_productData.getStok_barang() + " " + active_productData.getSatuan_barang());
 		TextView_product_category.setText(active_productData.getKategori_barang());
-		TextView_product_supplier.setText(store_name);
+		TextView_product_supplier.setText("ID: " + active_productData.getId_penjual() + " - " +store_name);
 		TextView_product_description.setText(active_productData.getDeskripsi_barang());
 	}
 
@@ -123,43 +119,91 @@ public class ProductDetail extends Activity {
 		TextView_product_description = (TextView) findViewById(R.id.TextView_product_description);
 		
 	}
+	
+	private void requestJSONObject() {
+		
+		//Data yang akan di kirim ke server
+		Map<String, String> dataToSend = new HashMap<String,String>();
+		dataToSend.put(Barang.ID_BARANG, String.valueOf(id_barang));
+		dataToSend.put(Barang.ID_USER, "1"); //TODO Asumsi user aktif adalah 1 = Anwar Pasaribu
+		
+		Log.i(TAG, "Request JSON Object, dataToSend: " + dataToSend.toString());
+		
+		CustonJsonObjectRequest jsonObjReq_singleData = new CustonJsonObjectRequest(
+				Method.POST,
+				AppsConstanta.URL_DATA, 
+				dataToSend,
+				new Response.Listener<JSONObject>() {
+	
+					@Override
+					public void onResponse(JSONObject response) {
+						
+						//Set JSONObject to return
+						parseJSONObject(response);
+						
+					}
+				}, new Response.ErrorListener() {
+	
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						VolleyLog.d(TAG, "Error: " + error.getMessage());
+						
+					}
+				});
+		
+		//Untuk memastikan cache yang dibuat pada Main.java tidak di-overwrite (27 Des)
+		jsonObjReq_singleData.setShouldCache(false);
+		
+		// Adding request to request queue
+		AppsController.getInstance().addToRequestQueue(jsonObjReq_singleData, volley_tag );		
+	
+		Log.i(TAG, "Done!! Request JSON Object");
+	}
 
 	//Parser utk JSONOBject dari MySQL Database
 	private void parseJSONObject(JSONObject responseJsonObject) {
 		
-    	try {
-    		
-    		JSONObject jsonResponse 		= new JSONObject(responseJsonObject.toString());    		
-    		int data_barang_size_new 		= jsonResponse.getInt(AppsConstanta.JSON_HEADER_DATA_SIZE);
-    		JSONArray jArray_dataBarang 	= jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BARANG);    		
-    		int jArray_dataBarang_length 	= jArray_dataBarang.length();
-    		
-    		if(data_barang_size_new != 0 ) {
-    			
-				for (int i = 0; i < jArray_dataBarang_length; i++ ) {
-					
-					JSONObject jsonObject = jArray_dataBarang.getJSONObject(i);
-					
-					//Mengubah data Barang di aController
-					aController.setBarangAtPosition(list_barang_index, 
-													aController.createBarangFromJSONObject(jsonObject));					
-				}
-    				
+		if(responseJsonObject != null) { 
+		
+	    	try {
+	    		
+	    		JSONObject jsonResponse 		= new JSONObject(responseJsonObject.toString());    		
+	    		int data_barang_size_new 		= jsonResponse.getInt(AppsConstanta.JSON_HEADER_DATA_SIZE);
+	    		JSONArray jArray_dataBarang 	= jsonResponse.getJSONArray(AppsConstanta.JSON_HEADER_BARANG);    		
+	    		int jArray_dataBarang_length 	= jArray_dataBarang.length();
+	    		
+	    		if(data_barang_size_new != 0 ) {
+	    			
+					for (int i = 0; i < jArray_dataBarang_length; i++ ) {
+						
+						JSONObject jsonObject = jArray_dataBarang.getJSONObject(i);
+						
+						//Mengubah data Barang di aController
+						aController.setBarangAtPosition(list_barang_index, 
+														aController.createBarangFromJSONObject(jsonObject));					
+					}
+	    				
+				
+	    		} else {
+	    			
+	    			Toast.makeText(getApplicationContext(), "Barang dengan ID : " + id_barang + " tidak tersedia.", Toast.LENGTH_LONG).show();
+	    			
+	    		}
+				
+				
+			} catch (Exception e) {
+				Log.e(TAG, "Tidak dapat mengambil data JSON saat parseJSONObject. Message : " + e.getMessage());
+				e.printStackTrace();
+			} finally {
+				
+				setTextViewContents();
+				
+			}
+    	
+		} else {
+			Toast.makeText(getApplicationContext(), "Tidak ada data dalam JSON Object", Toast.LENGTH_SHORT).show();;
 			
-    		} else {
-    			
-    			Toast.makeText(getApplicationContext(), "Barang dengan ID : " + id_barang + " tidak tersedia.", Toast.LENGTH_LONG).show();
-    			
-    		}
-			
-			
-		} catch (Exception e) {
-			Log.e(TAG, "Tidak dapat mengambil data JSON saat parseJSONObject. Message : " + e.getMessage());
-		} finally {
-			
-			setTextViewContents();
-			
-		}  	
+		}
     	
     	
 	}	
