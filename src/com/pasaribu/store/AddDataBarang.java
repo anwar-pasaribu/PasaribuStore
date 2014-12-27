@@ -173,7 +173,7 @@ public class AddDataBarang extends Activity
 	}
 
 	private ArrayAdapter<String> generateAdapter (List<String> list_data) {		
-		ArrayAdapter<String> adapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_item, list_data);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String> (this, android.R.layout.simple_dropdown_item_1line, list_data);
 		adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);		
 		return adapter;		
 	}
