@@ -1,6 +1,9 @@
 package com.pasaribu.store;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -21,14 +24,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-import com.android.volley.Request.Method;
 import com.google.gson.Gson;
 import com.pasaribu.store.adapter.DisplayGui;
 import com.pasaribu.store.adapter.TabPagerAdapter;
 import com.pasaribu.store.control.AppsController;
+import com.pasaribu.store.control.SortBarangByName;
 import com.pasaribu.store.data_model.AppsConstanta;
 import com.pasaribu.store.data_model.Barang;
 import com.pasaribu.store.data_model.Brand;
@@ -61,36 +65,31 @@ public class Main extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        //Inisialisasi Progress Dialog Box
-  		pDialog = new ProgressDialog(this);
-  		pDialog.setMessage("Loading...");
-  		pDialog.setCancelable(false);
+        initializeProgressDialog();
         
         //Application Controller, berisi data ter-share utk semua activity.
       	aController = (AppsController) getApplicationContext();	
         
-        //TODO Inisialisasi Kelas yang akan digunakan pada main class        
+        //Inisialisasi Kelas yang akan digunakan pada main class        
         displayGui = new DisplayGui(this); //Kelas untuk menampilkan GUI pada aplikasi                
         TabAdapter = new TabPagerAdapter(getSupportFragmentManager());        
         viewPagerTab = (ViewPager) findViewById(R.id.main_pager);
         
-        //Mengambil data list_home dari MySQL Database (Online)	
-  		if(aController.isNetworkAvailable()) {
+        //Mengambil data dari MySQL Database (Online)	
+  		if(aController.isNetworkAvailable() && aController.isFirstLoad) {
+  			Log.v(TAG, "Main requestAllDataBarangJSONObject called, isFirstLOad : " + String.valueOf(aController.isFirstLoad));
   			requestAllDataBarangJSONObject();
-  			Log.d(TAG, "Main requestAllDataBarangJSONObject called");
   		} else {
-  			
+  			Log.v(TAG, "Main getCacheData called, isFirstLOad : " + String.valueOf(aController.isFirstLoad));
   			getCacheData();
-  			Log.d(TAG, "Main getCacheData called");
-  			
   		}   
         	
     
     }
-    //end of onCreate
 
+    
 	/**
-	 * 
+	 * Membuat navigasi berupa tab.
 	 */
 	private void populateTabPager() {
 		
@@ -117,10 +116,10 @@ public class Main extends FragmentActivity {
         	@Override
 			public void onTabUnselected(android.app.ActionBar.Tab tab,
 					FragmentTransaction ft) {
-				// TODO lakukan jika tab unselected
         		
+        		// lakukan jika tab unselected        		
         		Log.i(TAG, tab.getPosition() + " Position (UnSelected)");
-				restoreIconAwal(tab);
+        		restoreIconAwal(tab);
 			}
         	
         	//Klik lagi pada tab yang sama
@@ -202,11 +201,14 @@ public class Main extends FragmentActivity {
 	}
     
     /**
-	 * Method hanya dilakukan jika ada jaringan internet
+	 * Memuat 50 data pertama dari jaringan. 
 	 */
 	public void requestAllDataBarangJSONObject() {	
 		
 		showProgressDialog();
+		
+//		Main.this.setProgressBarIndeterminateVisibility(true);
+		
 		loadingMore = true; //Menyamai tutorial
 		aController.isExecuted = true; //Karena di asumsikan setelah melalui akses jaringan data barang sudah ada pembaruan.
 		
@@ -225,8 +227,6 @@ public class Main extends FragmentActivity {
 	
 					@Override
 					public void onResponse(JSONObject response) {
-//						Gson gson = new GsonBuilder().setPrettyPrinting().create();						
-//						Log.i(TAG, "onResponse Listener, Data : " + gson.toJson(response));
 						
 						//Cek Header Data JSON, jika data barang tidak ada
 						if(response.isNull(AppsConstanta.JSON_HEADER_BARANG) 
@@ -302,6 +302,7 @@ public class Main extends FragmentActivity {
 				e.printStackTrace();
 			} finally {
 				cetakSimpleDataBarang("Semua data di cache : ", cachedResponse);
+				
 				aController.isExecuted = true; //utk memastikan bisa ekesekusi jika offline
 				parseReceivedJSONObject(cachedJsonObject);
 			}
@@ -327,7 +328,7 @@ public class Main extends FragmentActivity {
 				
 					JSONObject jsonObject = jArray_dataBarang.getJSONObject(i);
 					
-					Log.d(TAG, i + " - Nama : " + jsonObject.getString(Barang.NAMA_BARANG) );
+					Log.v(TAG, i + " - Nama : " + jsonObject.getString(Barang.NAMA_BARANG) );
 			}
 		
 		} catch (JSONException e) {
@@ -337,8 +338,16 @@ public class Main extends FragmentActivity {
 	}
 
 	/**
-	 * Inti dari pengolahan data. Untuk mengolah data dan disimpan pada Apps Controller
-	 * @param responseJsonObject
+	 * Inti dari pengolahan data. Untuk mengolah data dan disimpan pada Apps Controller.
+	 * Data yang diterima dari server adalah : <br>
+	 * 1. <b>Data Barang</b> : Data barang yang diurutkan berdasarkan <strong>id_barang</strong>.<br>
+	 * 2. <b>Data Penjual</b> : Data lengkap semua penjual. <br>
+	 * 3. <b>Data Brand</b> : Data merek/brand yang pernah dipakai pada sistem.<br>
+	 * 4. <b>Data Kategori</b> : Kategori barang yang ada <strong>HANYA</strong> digunakan dalam table barang. <br>
+	 * 5. <b>Ukuran Data Barang</b> : Jumlah data barang yang diberikan oleh server.<br>
+	 * 6. <b>Status Akhir Data Barang</b> : Untuk menginformasikan bahwa data yang diterima adalah data halaman terakhir.
+	 * <br>
+	 * @param responseJsonObject 
 	 */
 	private void parseReceivedJSONObject(JSONObject responseJsonObject) {
 		
@@ -370,35 +379,45 @@ public class Main extends FragmentActivity {
 					Log.v(TAG, "Tidak Akhir seluruh data, " + isEndOfData);
 				}
 				
-				//Ukuran barang lokal di kurang dengan banyak header
-				//int data_barang_size_local = aController.getBarangArrayListSize()- aController.getSize_listHuruf(); 
 
-				//TODO: Untuk mengambil data dari JSONArray Barang
-				//data_barang_size_new > 0 && data_barang_size_local != data_barang_size_new
+				//TODO Pengolah data barang (masih belum efisien).
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				///////////////////////////////////////BARANG///////////////////////////////////////////////////////////
+				// Untuk mengambil data dari JSONArray Barang
+				// data_barang_size_new > 0 && data_barang_size_local != data_barang_size_new
+				// SELURUH data List Barang pada Application Controller akan diganti dengan data baru dari server atau cache
+				// setiap kali data_lokal != data_baru
 				if (jArray_dataBarang.length() == 0) {
 
 					showAlertDialog("Data Barang Kosong", "Data barang tidak ada, silahkan restart aplikasi");
 
 				} else if(aController.getBarangArrayListSize() != jArray_dataBarang.length()) {
 					Log.d(TAG, "Jumlah data on parse: " + data_barang_size_new);
-
-					//JSONObject jsonObject = null;	  	
+					
+					//List yang akan menampung data barang untuk sementara
+					List<Barang> temp_listBarang = new ArrayList<Barang>();
 
 					for (i = 0; i < jArray_dataBarang.length(); i++) {
 
 						start_from++; //untuk memperbarui index data dimulai dari mana
 
-						//jsonObject = jArray_dataBarang.getJSONObject(i);
-						//aController.addToListBarangFull(aController.createBarangFromJSONObject(jsonObject));
-
 						String barangInfo = jArray_dataBarang.getJSONObject(i).toString();
 						Barang barang = gson.fromJson(barangInfo, Barang.class); //Dengan gson, mengubah json menjadi data Barang
 						
-						Log.d(TAG, "Data barang ke- " + i + " :" + barangInfo);
+						temp_listBarang.add(barang);
 						
-						aController.addToListBarang(barang);
+						//aController.addToListBarang(barang);						
+						Log.d(TAG, "Data barang ke- " + i + " :" + barang.getId_barang() + ", Nama : " + barang.getNama_barang());
 						
 					}
+					
+					//Untuk sortir list barang berdasarkan Nama Barang
+					Collections.sort(temp_listBarang, new SortBarangByName("ASC"));
+					
+					aController.getAllBarangList().clear();
+					aController.getAllBarangList().addAll(temp_listBarang);
+					
+					temp_listBarang.clear(); //Membersihkan list temporer guna menghemat memori.
 					
 					loadingMore = false;
 					
@@ -406,8 +425,10 @@ public class Main extends FragmentActivity {
 				} else {
 					Log.w(TAG, "Tidak ada perubahan data yang dilakukan karena data lokal sama dengan data yang didapatkan dari jaringan.");
 				}
+				//////////////////////////////BARANG - END///////////////////////////////////////////////////////////////
+				
 
-				//TODO: Untuk mengambil data dari JSONArray Supplier
+				//Untuk mengambil data dari JSONArray Supplier
 				int jArray_SupplierDataLength = jArray_SupplierData.length();
 				if (aController.getList_supplier().size() != jArray_SupplierDataLength) {
 
@@ -430,7 +451,7 @@ public class Main extends FragmentActivity {
 					}
 				}
 
-				//TODO: Untuk mengambil data dari JSONArray Brand
+				//Untuk mengambil data dari JSONArray Brand
 				int jArray_BrandDataLength = jArray_BrandData.length();
 				if (aController.getList_brand().size() != jArray_BrandDataLength) {
 
@@ -450,7 +471,7 @@ public class Main extends FragmentActivity {
 					}
 				}
 
-				//TODO: Untuk mengambil data dari JSONArray Category
+				//Untuk mengambil data dari JSONArray Category
 				int jArray_CategoryDataLength = jArray_CategoryData.length();
 				if (aController.getList_product_category().size() != jArray_CategoryDataLength) {
 
@@ -473,10 +494,13 @@ public class Main extends FragmentActivity {
 						+ aController.getList_brand().size());
 				
 				
-				//Setiap pemanggilan keseluruhan, isExecuted akan di ubah menjadi false jika tidak ada jaringan net.
+				//Setiap pemanggilan keseluruhan, isExecuted dan isFirstLoad akan di ubah menjadi false jika tidak ada jaringan net.
 				//Untuk membuat parsing hanya dilakukan sekali.
 				aController.isExecuted = false;
+				aController.isFirstLoad = false;
+				
 				Log.i(TAG,"Parsing data selesai dilakukan, isExecuted : " + String.valueOf(aController.isExecuted));
+				Log.i(TAG,", isFirstLOad : " + String.valueOf(aController.isFirstLoad));
 
 			} catch (JSONException e) {
 
@@ -512,6 +536,18 @@ public class Main extends FragmentActivity {
 	}
     
     
+	
+	
+	/**
+	 * Untuk mendeklarasikan dialog box berupa popup.
+	 */
+	private void initializeProgressDialog() {
+		//Inisialisasi Progress Dialog Box
+  		pDialog = new ProgressDialog(this);
+  		pDialog.setMessage(this.getString(R.string.msg_loading_data));
+  		pDialog.setCancelable(false);
+	}
+	
 	private void showProgressDialog() {
 		if (!pDialog.isShowing())
 			pDialog.show();
@@ -524,12 +560,9 @@ public class Main extends FragmentActivity {
     
     
     
-    
-    
-    
-    
-    
-    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////Options Menu//////////////////////////////////////////////////////////
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		Log.v(TAG, "onCreateOptionsMenu Main Called");
@@ -566,7 +599,7 @@ public class Main extends FragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
     
-
+	///////////////////////////////////////Options Menu - End///////////////////////////////////////////////////
 
     
 }
