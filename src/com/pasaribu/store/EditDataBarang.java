@@ -135,7 +135,7 @@ public class EditDataBarang extends Activity
 		list_data_product_unit.add("Buah");
 		list_data_product_unit.add("Plastik");	
 		
-		autoComp_product_unit.setAdapter(generateAdapter(list_data_product_unit));
+		autoComp_product_unit.setAdapter(generateAdapter(list_data_product_unit));;
 		
 		setFormContents();
 		
@@ -220,7 +220,7 @@ public class EditDataBarang extends Activity
 	
 	
 	private ArrayAdapter<String> generateAdapter (List<String> list_data) {		
-		ArrayAdapter<String> adapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_item, list_data);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String> (this, android.R.layout.simple_dropdown_item_1line, list_data);
 		adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);		
 		return adapter;		
 	}
@@ -272,11 +272,18 @@ public class EditDataBarang extends Activity
 		data_barang_to_edit.put(Barang.ID_BARANG, active_productData.getId_barang()+""); 
 		data_barang_to_edit.put(Barang.ID_USER, "1"); //TODO Guna - User Aktif diasumsikan!
 		
-		//periksa perubahan data yang dibuat sehingga data yg di kirim hanya yang perubahan
+		/////////////////////////////////////////////////////////////////////////////////////
+		//periksa perubahan data yang dibuat sehingga data yg di kirim hanya yang perubahan//
+		/////////////////////////////////////////////////////////////////////////////////////
+		
+		//Jika product_brand berupa integer maka cek apakah ada berubahan dengan data asli,
+		//jika berupa string sudah dipastikan product_brand bernilai baru.
 		if(isInteger(product_brand, RADIX)) {
 			if(Integer.parseInt(product_brand) != active_productData.getId_merek()) {
 				data_barang_to_edit.put(Barang.ID_MEREK, product_brand);
 			}
+		} else {
+			data_barang_to_edit.put(Barang.ID_MEREK, product_brand);
 		}
 		
 		if(isInteger(product_supplier, RADIX)) {
@@ -331,12 +338,14 @@ public class EditDataBarang extends Activity
 		int data_barang_to_edit_size = data_barang_to_edit.size();
 		
 		if(data_barang_to_edit_size != 2) {
-			//TODO Remind - Akses jaringan hanya jika terkoneksi jaringan
-			if(aController.isNetworkAvailable())
+			//Akses jaringan hanya jika terkoneksi jaringan
+			if(aController.isNetworkAvailable()) {
 				jsonObjectAccess(AppsConstanta.URL_UPDATE_PRODUCT, data_barang_to_edit);
-			else {
+				aController.isDataChanged = true; //Untuk membertahu aplikasi bahwa ada perubahan data
+			}else {
 				Log.e(TAG, "No network, database can not change");
 				aController.setBarangAtPosition(list_barang_index, active_productData);
+				aController.isDataChanged = true; //Untuk membertahu aplikasi bahwa ada perubahan data
 			}
 			
 		} else {
@@ -562,6 +571,9 @@ public class EditDataBarang extends Activity
 								//Lakukan jika berhasil input data ke MySQL database
 								showAlertDialog("Data Berhasil Diubah", "Data berhasil diubah ke penyimpanan pusat.");
 								
+								//Kemudian data lokal di update
+								aController.setBarangAtPosition(list_barang_index, active_productData);
+								
 							} else {
 								//Lakukan jika gagal input data ke MySQL database
 								showAlertDialog("Tidak Bisa Mengubah Data", "Proses ubah data barang gagal. Periksa kembali form, pastikan sudah di isi dengan baik");
@@ -593,7 +605,7 @@ public class EditDataBarang extends Activity
 		// Adding request to request queue
 		AppsController.getInstance().addToRequestQueue(addDataBarangjsonObjReq, tag_add_data_barang);		
 		
-		} 
+	} 
 	
 	
 	private void showProgressDialog() {

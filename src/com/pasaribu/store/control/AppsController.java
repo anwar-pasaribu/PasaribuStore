@@ -11,6 +11,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -44,11 +45,23 @@ public class AppsController extends Application {
 	//Asumsi pertama boleh dilakukan, utk Home.java
 	public boolean isExecuted = true;
 	
-	/* From androidhive.com -start- */
+	//Mengidentifikasi perubahan data barang, utk notifyDataChanged pada Home.java
+	public boolean isDataChanged = false;
+	
+	//Mengetahui apakah aplikasi pertama kali di buka, berguna utk menentukan pengambilan 50 data pertama
+	public boolean isFirstLoad = true;
+	
+	//Lokasi Scroll ListView pada Home (25 Des / Christmas!)
+	public int listHome_lastViewedPosition = 0;
+	public int listHome_topOffset = 0;
+	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		mInstance = this;
+		
+		Log.v(TAG, "Apps Conroller onCreate");
 	}
 	
 	public static synchronized AppsController getInstance() {

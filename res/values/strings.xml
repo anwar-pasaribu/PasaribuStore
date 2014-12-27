@@ -47,5 +47,6 @@
     <string name="hint_ipAddress">Alamat IP Server</string>
     <string name="title_activity_product_detail">Product Detail</string>
     <string name="title_supplier">Supplier</string>
+    <string name="msg_loading_data">Memuat data&#8230;</string>
 
 </resources>

@@ -54,6 +54,8 @@ public class GetCloudData {
 						//Set JSONObject to return
 						setJsonObject(response);
 						
+						Log.v(TAG, "onResponse data : " + response.toString());
+						
 					}
 				}, new Response.ErrorListener() {
 	
@@ -68,8 +70,9 @@ public class GetCloudData {
 				
 		// Adding request to request queue
 		AppsController.getInstance().addToRequestQueue(generalJsonObjReq, volley_tag);		
-		
-		} 			
+	
+		Log.i(TAG, "Done!! Request JSON Object");
+	} 			
 		//getJSONObject -end- //
 	
 	

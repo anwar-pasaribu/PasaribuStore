@@ -58,8 +58,8 @@ public class ListHomeAdapter
 	}
 	
 	//////////////////////////////////////////////////////////////////////
-	//Membuat Interface Callback utk dapat digunakan oleh
-	//Home.java
+	//Membuat Interface Callback utk dapat digunakan oleh/////////////////
+	//Home.java///////////////////////////////////////////////////////////
 	public void setCallBack(ListHomeAdapterListener custListHomeListener) {
 		this.custListHomeListener = custListHomeListener;
 	}
@@ -68,6 +68,7 @@ public class ListHomeAdapter
 		public void deleteDataBarangSuccess(boolean status);
 	}
 	///////////////////////////////////////////////////////////////////////
+	
 	
 	public void add(Barang barang) {
 		this.dataBarangHome.add(barang);
@@ -121,7 +122,7 @@ public class ListHomeAdapter
 			//Format teks utk text_product_stock_date TextView | 6 Unit - 15 Nov
 			text_product_stock_price = 	dataAktif.getStok_barang() 
 										+ " " + dataAktif.getSatuan_barang() 
-										+ " - " + Helper.getIndonesianDate(dataAktif.getTgl_stok_barang()); //TODO Buat fungsi pengubah tgl MySQL ke format indonesia
+										+ " - " + Helper.getIndonesianDate(dataAktif.getTgl_stok_barang()); //Tgl MySQL ke format indonesia
 					
 			holder.text_product_name.setText(dataAktif.getNama_barang());
 			holder.text_product_price.setText("Rp " + dataAktif.getHarga_barang());

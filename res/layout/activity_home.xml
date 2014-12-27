@@ -22,6 +22,13 @@
             android:textSize="@dimen/title_font_size" />
 
         <!-- Single choice, Update : 17 Des -->
+
+        <ProgressBar
+            android:id="@+id/progressBar_listRecently"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <ListView
             android:id="@+id/list_recently"
             android:layout_width="match_parent"
@@ -38,6 +45,12 @@
         android:layout_weight="5"
         android:background="@android:color/background_light"
         android:orientation="vertical" >
+
+        <ProgressBar
+            android:id="@+id/progressBar_listHome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical" />
 
         <ListView
             android:id="@+id/list_home"

@@ -28,9 +28,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="@string/hint_product_name"
-            android:text="Nama Barang Yang Sangat Panjang Sehinggap Harus bisa di kontrol dengan baik, utk memastikan GUI tertampilkan dengan baik dan indah"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            >
+            android:text="..."
+            android:textAppearance="?android:attr/textAppearanceMedium" >
 
             <requestFocus />
         </TextView>

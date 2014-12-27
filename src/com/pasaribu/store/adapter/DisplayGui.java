@@ -24,10 +24,9 @@ public class DisplayGui {
 		Log.i(TAG, "Constructor Dikerjakan");
 	}
 
-	/* MENAMPILKAN TOAST
-	*  Menampilkan Toast Durasi pendek pada context main
+	/** MENAMPILKAN TOAST
+	*  Menampilkan Toast Durasi pendek pada context main.
 	*/
-	
 	public void displayToast(String data) {
     	Toast.makeText(getMainContext(), data, Toast.LENGTH_SHORT).show();
     }
@@ -37,8 +36,7 @@ public class DisplayGui {
 	 * <p>Alert Dialog dengan tombol OK, biasa digunakan untuk pesan penting utk user.
 	 * @param title Judul pesan yang akan ditampilkan
 	 * @param message Isi pesan dalam badan dialog box
-	 */
-	
+	 */	
 	public void showAlertDialog(String title, String message) {		
 		
     	new AlertDialog.Builder(getMainContext())
@@ -64,12 +62,10 @@ public class DisplayGui {
 		
 	}
 	
+	
 	////////////////////////////////////////////////////////////////////////////
 	// BAGIAN SETTER dan GETTER ///////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////
-	
-	
-	
+	///////////////////////////////////////////////////////////////////////////	
 	public Context getMainContext() {
 		return mainContext;
 	}
